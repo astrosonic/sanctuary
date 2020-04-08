@@ -34,13 +34,21 @@
             <br/>
             <div>
                 <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
-                    <div class="message_holder">
+                    <div class="mailhold">
 
                     </div>
                     <div>
                         <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #222222;">
                             <form action="" method="POST">
-                                <input type="text" class="uk-input roomname uk-border-rounded mailbody" placeholder="Type your message and hit RETURN to send" />
+                                <input type="text" class="uk-input roomname uk-border-rounded mailbody" placeholder="[RETURN] to SEND | [Ctrl+R] to REFRESH" />
+                                <p style="margin-top: 5px;">
+                                    <span class="uk-float-right">
+                                        <button type="submit" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Send chat; pos: bottom;"><span uk-icon="icon: check"></span></button>
+                                        <button onclick="location.reload()" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Refresh page; pos: bottom;"><span uk-icon="icon: refresh"></span></button>
+                                        <button onclick="window.location.href = '{{ url_for("shutroom") }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Leave room; pos: bottom;"><span uk-icon="icon: close"></span></button>
+                                        <button onclick="window.location.href = '{{ url_for("shutroom") }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Purge room; pos: bottom;"><span uk-icon="icon: trash"></span></button>
+                                    </span>
+                                </p>
                             </form>
                         </div>
                     </div>
@@ -89,7 +97,7 @@
             )
             socket.on
             (
-                'my response',
+                'response',
                 function(msg)
                 {
                     console.log(msg)
@@ -97,7 +105,7 @@
                     {
                         if (msg.roomname == "{{ basedata["roomname"] }}")
                         {
-                            $('div.message_holder').append
+                            $('div.mailhold').append
                             (
                                 '<article class="uk-comment uk-background-secondary uk-border-rounded">' +
                                 '<header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>' +
@@ -107,7 +115,7 @@
                                 '<div class="uk-width-expand">' +
                                 '<h7 class="uk-margin-remove bossnorm primcolr">'+ msg.username +'&nbsp;&nbsp;</h7>' +
                                 '<span class="uk-margin-remove uk-text-small contital">Sent on ' + msg.datetime + ' HRS {{ duration["timezone"] }}</span>' +
-                                '<h5 class="uk-margin-remove monotext tertcolr">' + msg.mailbody + '</h5>' +
+                                '<h5 class="uk-margin-remove monotext tertcolr" style="word-wrap: break-word; padding-right: 25px;">' + msg.mailbody + '</h5>' +
                                 '</div>' +
                                 '</header>' +
                                 '</article>'
