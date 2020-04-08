@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ curtuser }}@{{ basedata["roomname"] }} - Sanctuary</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/uikit.min.css") }}" />
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/custfrmt.css") }}" />
+        <script src="{{ url_for("static", filename="jscn/uikit.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/uikit-icons.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/socket.io.min.js") }}"></script>
+    </head>
+    <body class="uk-background-secondary">
+        <div class="uk-container uk-container-small">
+            <br/>
+            <h1 class="uk-margin-remove headnorm primcolr">Sanctuary</h1>
+            <h3 class="uk-margin-remove bossnorm secocolr">{{ curtuser }}@{{ basedata["roomname"] }}</h3>
+            <p class="uk-margin-remove contnorm tertcolr">
+                <span class="bossnorm">Chatroom created by {{ basedata["ownrname"] }}</span><br/>
+                <span class="bossnorm">Lifetime </span>{{ strttime["hour"] }}:{{ strttime["mins"] }}:{{ strttime["secs"] }} - {{ stoptime["hour"] }}:{{ stoptime["mins"] }}:{{ stoptime["secs"] }} hrs {{ duration["timezone"] }}<br/>
+                <span class="bossnorm">Duration </span>{{ duration["totaperd"] }} seconds<br/>
+                <span class="bossnorm">Basic HTML5 formatting enabled</span>
+            </p>
+            <br/>
+            <h2 class="uk-margin-remove bossnorm secocolr">Welcome to the {{ basedata["roomname"] }} chatroom!</h2>
+            <h4 class="uk-margin-remove contnorm tertcolr uk-text-justify">
+                You have now joined a private chatroom via invitation link and password. You can invite, talk
+                and leave at will during the active time of the chatroom beyond which it will expire.
+                <span class="bossnorm secocolr">Refresh the page</span>, <span class="bossnorm secocolr">close the tab</span>,
+                <span class="bossnorm secocolr">leave the chat</span> or <span class="bossnorm secocolr">purge the chatroom</span>
+                to quickly get rid of all messages.
+            </h4>
+            <br/>
+            <div>
+                <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
+                    <div class="message_holder">
+
+                    </div>
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #222222;">
+                            <form action="" method="POST">
+                                <input type="text" class="uk-input roomname uk-border-rounded mailbody" placeholder="Type your message and hit RETURN to send" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <script type="text/javascript">
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+            socket.on
+            (
+                'connect',
+                function()
+                {
+                    socket.emit
+                    (
+                        'my event',
+                        {
+                            data: 'User Connected'
+                        }
+                    )
+                    var form = $('form').on
+                    (
+                        'submit',
+                        function(e)
+                        {
+                            e.preventDefault()
+                            var username = '{{ curtuser }}'
+                            var mailbody = $('input.mailbody').val()
+                            var curtdate = new Date();
+                            var datetime = curtdate.getHours() + ":" + curtdate.getMinutes() + ":" + curtdate.getSeconds();
+                            socket.emit
+                            (
+                                'my event',
+                                {
+                                    username : username,
+                                    mailbody : mailbody,
+                                    datetime : datetime,
+                                    roomname : '{{ basedata["roomname"] }}'
+                                }
+                            )
+                            //var mailtext = document.getElementsByClassName("mailbody");
+                            //mailtext.value = "";
+                            $('input.mailbody').val('').focus()
+                        }
+                    )
+                }
+            )
+            socket.on
+            (
+                'my response',
+                function(msg)
+                {
+                    console.log(msg)
+                    if (typeof msg.username !== 'undefined')
+                    {
+                        if (msg.roomname == "{{ basedata["roomname"] }}")
+                        {
+                            $('div.message_holder').append
+                            (
+                                '<article class="uk-comment uk-background-secondary uk-border-rounded">' +
+                                '<header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>' +
+                                '<div class="uk-width-auto">' +
+                                '<img class="uk-comment-avatar uk-border-rounded" src="{{ url_for("static", filename="imgs/avtrgrfx.jpg") }}" width="80" height="80" alt="">' +
+                                '</div>' +
+                                '<div class="uk-width-expand">' +
+                                '<h7 class="uk-margin-remove bossnorm primcolr">'+ msg.username +'&nbsp;&nbsp;</h7>' +
+                                '<span class="uk-margin-remove uk-text-small contital">Sent on ' + msg.datetime + ' HRS {{ duration["timezone"] }}</span>' +
+                                '<h5 class="uk-margin-remove monotext tertcolr">' + msg.mailbody + '</h5>' +
+                                '</div>' +
+                                '</header>' +
+                                '</article>'
+                            )
+                        }
+                    }
+                }
+            )
+        </script>
+    </body>
+</html>
+

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sanctuary</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/uikit.min.css") }}" />
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/custfrmt.css") }}" />
+        <script src="{{ url_for("static", filename="jscn/uikit.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/uikit-icons.min.js") }}"></script>
+    </head>
+    <body class="uk-background-secondary">
+        <div class="uk-container uk-container-small">
+            <br/>
+            <h1 class="uk-margin-remove headnorm primcolr">Sanctuary</h1>
+            <h3 class="uk-margin-remove bossnorm secocolr">Your data should not linger about forever</h3>
+            <h4 class="contnorm tertcolr uk-text-justify">
+                With the overflow of user generated content across the globe and the sordid state of usage and
+                privacy terms, you definitely would not want your conversations to linger about in the vulnerable
+                databases or in the hands of advertising agencies - Take your protection in your control
+            </h4>
+            <br/>
+            {% if erormesg != "" %}
+            <div class="uk-alert-danger uk-border-rounded" style="background-color: #333333;" uk-alert>
+                <p class="normelem">{{ erormesg }}</p>
+            </div><br/>
+            {% endif %}
+            <div class="uk-child-width-1-2@s" uk-grid>
+                <div>
+                    <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
+                        <h4 class="uk-margin-remove bossnorm secocolr">Create new chatroom</h4>
+                        <h1 class="uk-margin-remove headnorm primcolr">Initiate</h1>
+                        <p class="contnorm tertcolr uk-text-justify">
+                            This will create a private chatroom with you as its admin. Of course, you will get a link
+                            to chatroom which you can share with your allies so that they can join.
+                        </p>
+                        <form name="makeroom" method="POST">
+                            <fieldset class="uk-fieldset">
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="text" name="mkrmname" placeholder="Enter your chatroom name">
+                                </div>
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="text" name="mkrmownr" placeholder="Enter your alias">
+                                </div>
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="password" name="mkrmpass" placeholder="Enter your joining password">
+                                </div>
+                                <div class="uk-margin">
+                                    <input type="submit" name="makebutn" value="INITIATE" class="uk-button roombutn"/>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
+                        <h4 class="uk-margin-remove bossnorm secocolr">Join existing chatroom</h4>
+                        <h1 class="uk-margin-remove headnorm primcolr">Onboard</h1>
+                        <p class="contnorm tertcolr uk-text-justify">
+                            This will let you join an existing chatroom with you as a participant. You can join a
+                            chatroom only if you were invited and have the password for joining.
+                        </p>
+                        <form name="joinroom" method="POST">
+                            <fieldset class="uk-fieldset">
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="text" name="jnrmlink" placeholder="Enter your chatroom link">
+                                </div>
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="text" name="jnrmuser" placeholder="Enter your alias">
+                                </div>
+                                <div class="uk-margin">
+                                    <input class="uk-input roomname uk-border-rounded" type="password" name="jnrmpass" placeholder="Enter your joining password">
+                                </div>
+                                <div class="uk-margin">
+                                    <input type="submit" name="joinbutn" value="ONBOARD" class="uk-button roombutn"/>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+    </body>
+</html>
+
