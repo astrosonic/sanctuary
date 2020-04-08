@@ -5,7 +5,7 @@ import libraries.make as make
 import libraries.join as join
 
 main = Flask(__name__)
-main.config["SECRET_KEY"] = "vnkdjnfjknfl1232#"
+main.config["SECRET_KEY"] = "2190913f505d968cee4d2b6050f85b36e57ae2fdf765c9f1f9f47fbc59ab7c60a4fcf933d00760e9a6c0d1dc1b0450c1d52e4427976644ff22223445472a3add"
 socketio = SocketIO(main)
 
 def makeroom(makedict):
@@ -19,9 +19,9 @@ def makeroom(makedict):
                            duration=duration, strttime=strttime, stoptime=stoptime)
 
 def joinroom(joindict):
-    ftchinfo = join.generate(joindict["jnrmlink"])
-    session["username"] = joindict["jnrmuser"]
     session["actiroom"] = joindict["jnrmlink"]
+    session["username"] = joindict["jnrmuser"]
+    ftchinfo = join.generate(joindict["jnrmlink"])
     distinct = ftchinfo["distinct"]
     basedata = ftchinfo["basedata"]
     duration = ftchinfo["duration"]
@@ -31,7 +31,27 @@ def joinroom(joindict):
                            duration=duration, strttime=strttime, stoptime=stoptime,
                            curtuser=joindict["jnrmuser"])
 
-@main.route("/",methods=["GET","POST"])
+@main.route("/sesskill/")
+def sesskill():
+    if "username" in session:
+        session.pop("username", None)
+        return mainmenu(erorlist["logedout"])
+    else:
+        return mainmenu(erorlist["exprsess"])
+
+@main.route("/actiroom/<roomname>/<roomlink>/", methods=["GET","POST"])
+def actiroom(roomname, roomlink):
+    if "username" in session:
+        return render_template("actiroom.html", roomlink=roomlink,
+                               roomname=roomname, curtuser=session["username"])
+    else:
+        return mainmenu(erorlist["exprsess"])
+
+@main.route("/shutroom/")
+def shutroom():
+    return mainmenu(erorlist["killroom"])
+
+@main.route("/", methods=["GET","POST"])
 def mainmenu(erormesg=""):
     if request.method == "POST":
         if "makebutn" in request.form:
@@ -84,21 +104,26 @@ def mainmenu(erormesg=""):
                                 "jnrmpass": jnrmpass,
                             }
                             print(joindict)
+                            session["username"] = jnrmuser
+                            session["actiroom"] = jnrmlink
                             return joinroom(joindict)
                         return render_template("homepage.html", erormesg=erormesg)
                     return render_template("homepage.html", erormesg=erormesg)
                 return render_template("homepage.html", erormesg=erormesg)
             return render_template("homepage.html", erormesg=erormesg)
-        #return render_template("homepage.html", erormesg=erormesg)
+        return render_template("homepage.html", erormesg=erormesg)
     return render_template("homepage.html", erormesg=erormesg)
 
-def messageReceived(methods=["GET", "POST"]):
-    print("message was received!!!")
+def mailrecv():
+    print("Message was received!!!")
 
-@socketio.on("my event")
-def handle_my_custom_event(json, methods=["GET", "POST"]):
-    print("received my event: " + str(json))
-    socketio.emit("my response", json, callback=messageReceived)
+@socketio.on("sendevnt")
+def handle_my_custom_event(jsonobjc):
+    if "username" in session:
+        print("Received my event: " + str(jsonobjc))
+        socketio.emit("response", jsonobjc, callback=mailrecv)
+    else:
+        return mainmenu(erorlist["exprsess"])
 
 if __name__ == "__main__":
     socketio.run(main, host="0.0.0.0", port=6969, debug=True)
