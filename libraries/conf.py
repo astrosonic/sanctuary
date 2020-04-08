@@ -6,6 +6,9 @@ baseloca = {
 }
 
 erorlist = {
+    "killroom": "The chatroom was purged successfully. [NOT IMPLEMENTED]",
+    "exprsess": "The session you specified has expired",
+    "logedout": "You have successfully logged out",
     "mknameab": "You did not provide a room name",
     "nospname": "Spaces cannot be addded to room names",
     "mkownrab": "You did not provide the owner alias",
