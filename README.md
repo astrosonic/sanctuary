@@ -8,7 +8,8 @@ A secure synchronous lightweight chatroom with zero logging and total transience
 
 ## Salient features
 * Provides real-time conversation using synchronous sockets
-* No logging or data storage - reduces probable vulnerabilities
+* Zero logging or data storage to minimize vulnerabilities
+* No-frills alias and password-protected chatroom creation
 * Refresh, close tab, logout or purge chatroom to cover tracks
 * Transient chatrooms stay valid for 60 minutes before auto-purge
 * Complete support for HTML5 formatting tags in conversations
