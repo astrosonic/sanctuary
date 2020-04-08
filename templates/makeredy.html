@@ -20,6 +20,11 @@
                 - which you can share with your allies along with password so they can join.
             </h4>
             <br/>
+            <button onclick="window.location.href = '{{ url_for("mainmenu") }}'" class="uk-button uk-border-rounded backmain">
+                GO BACK TO HOMEPAGE
+            </button>
+            <br/>
+            <br/>
             <div>
                 <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
                     <h4 class="uk-margin-remove bossnorm secocolr">Chatroom name</h4>
@@ -69,11 +74,6 @@
                 </div>
             </div>
             <br/>
-            <a href="{{ url_for("mainmenu") }}">
-                <button class="uk-button uk-border-rounded backmain">
-                    GO BACK TO HOMEPAGE
-                </button>
-            </a>
         </div>
         <br/>
     </body>
