@@ -33,7 +33,7 @@
                                         <button type="submit" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Send chat; pos: bottom;"><span uk-icon="icon: check"></span></button>
                                         <button onclick="location.reload()" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Refresh page; pos: bottom;"><span uk-icon="icon: refresh"></span></button>
                                         <button onclick="window.location.href = '{{ url_for("sesskill") }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Leave room; pos: bottom;"><span uk-icon="icon: close"></span></button>
-                                        <button onclick="window.location.href = '{{ url_for("shutroom") }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Purge room; pos: bottom;"><span uk-icon="icon: trash"></span></button>
+                                        <button onclick="window.location.href = '{{ url_for("shutroom", username=curtuser, roomlink=roomlink) }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Purge room; pos: bottom;"><span uk-icon="icon: trash"></span></button>
                                     </span>
                                 </p>
                             </form>
@@ -112,7 +112,22 @@
                     }
                 }
             )
+            socket.on
+            (
+                'shutkick',
+                function()
+                {
+                    window.location.href = '{{ url_for("shutkick", roomlink=roomlink) }}'
+                }
+            )
+            socket.on
+            (
+                'timekick',
+                function()
+                {
+                    window.location.href = '{{ url_for("timekick", roomlink=roomlink) }}'
+                }
+            )
         </script>
     </body>
 </html>
-
