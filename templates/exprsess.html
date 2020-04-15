@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Session expired</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/uikit.min.css") }}" />
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/custfrmt.css") }}" />
+        <script src="{{ url_for("static", filename="jscn/uikit.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/uikit-icons.min.js") }}"></script>
+    </head>
+    <body class="uk-background-secondary">
+        <div class="uk-container uk-container-small">
+            <br/>
+            <h1 class="uk-margin-remove headnorm primcolr">Sanctuary</h1>
+            <h3 class="uk-margin-remove bossnorm secocolr">The specified session has expired or invalidated</h3>
+            <h4 class="contnorm tertcolr uk-text-justify">
+                You are trying to access a session which has expired or invalidated. If you logged out by
+                mistake, you are suggested to go back to homepage and log back into your chatroom again.
+            </h4>
+            <br/>
+            <button onclick="window.location.href = '{{ url_for("mainmenu") }}'" class="uk-button uk-border-rounded backmain">
+                GO BACK TO HOMEPAGE
+            </button>
+            <br/>
+            <br/>
+        </div>
+        <br/>
+    </body>
+</html>
+
