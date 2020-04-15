@@ -61,22 +61,6 @@ def shutroom(username, roomlink):
     shut.generate(dictinfo)
     return render_template("shutroom.html")
 
-@main.route("/shutkick/")
-def shutkick():
-    if "username" in session:
-        #session.pop("username", None)
-        return render_template("shutkick.html")
-    else:
-        return redirect(url_for("exprsess"))
-
-@main.route("/timekick/")
-def timekick():
-    if "username" in session:
-        #session.pop("username", None)
-        return render_template("timekick.html")
-    else:
-        return redirect(url_for("exprsess"))
-
 @main.route("/", methods=["GET","POST"])
 def mainmenu(erormesg=""):
     if request.method == "POST":
@@ -148,23 +132,47 @@ def mainmenu(erormesg=""):
 def mailrecv():
     print("Message was received!!!")
 
-@socketio.on("shutkick")
-def shutkick_event():
-    socketio.emit("shutkick")
+def actirecv():
+    print("Either EXPIRY or PURGIFICATION was acknowledged!!!")
+
+@socketio.on("shutevnt")
+def shutkick_event(jsonobjc):
+    print("Received my event: " + str(jsonobjc))
+    socketio.emit("response", jsonobjc, callback=mailrecv)
+
+@main.route("/shutkick/<roomlink>")
+def shutkick(roomlink):
+    if "username" in session:
+        session.pop("username", None)
+        print(session)
+        return render_template("shutkick.html")
+    else:
+        print("INVALSES")
+        return redirect(url_for("exprsess"))
+
+@main.route("/timekick/<roomlink>")
+def timekick(roomlink):
+    if "username" in session:
+        session.pop("username", None)
+        print(session)
+        return render_template("timekick.html")
+    else:
+        print("INVALSES")
+        return redirect(url_for("exprsess"))
 
 @socketio.on("sendevnt")
 def handle_my_custom_event(jsonobjc):
     if "username" in session:
-        #print(session)
+        print(session)
         roomlink = jsonobjc["roomlink"]
         if join.timevald(roomlink) is True:
             if join.shutvald(roomlink) is False:
                 print("Received my event: " + str(jsonobjc))
                 socketio.emit("response", jsonobjc, callback=mailrecv)
             else:
-                return redirect(url_for("shutkick"))
+                socketio.emit("shutkick", callback=actirecv)
         else:
-            return redirect(url_for("timekick"))
+            socketio.emit("timekick", callback=actirecv)
     else:
         return redirect(url_for("exprsess"))
 
