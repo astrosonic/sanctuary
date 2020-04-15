@@ -18,7 +18,7 @@ def fetcqury(qurytext):
     return fetcdata
 
 def roomexst(jnrmlink):
-    qurytext = "select * from roomlist where iden = '" + str(jnrmlink) + "'"
+    qurytext = "select * from roomlist where RoomIdentity = '" + str(jnrmlink) + "'"
     roomdata = fetcqury(qurytext)
     if roomdata is None:
         return False
@@ -27,7 +27,7 @@ def roomexst(jnrmlink):
 
 def timevald(jnrmlink):
     if roomexst(jnrmlink) is True:
-        qurytext = "select strt, stop from roomlist where iden = '" + str(jnrmlink) + "'"
+        qurytext = "select OperationStartTime, OperationStopTime from roomlist where RoomIdentity = '" + str(jnrmlink) + "'"
         roomdata = fetcqury(qurytext)
         strttime = float(roomdata[0])
         stoptime = float(roomdata[1])
@@ -39,10 +39,22 @@ def timevald(jnrmlink):
     else:
         return False
 
+def shutvald(jnrmlink):
+    if timevald(jnrmlink) is True:
+        qurytext = "select IsItPurged from roomlist where RoomIdentity = '" + str(jnrmlink) + "'"
+        roomdata = fetcqury(qurytext)
+        response = str(roomdata[0])
+        if response == "False":
+            return False
+        else:
+            return True
+    else:
+        return True
+
 def passchek(jnrmlink, jnrmpass):
     if timevald(jnrmlink) is True:
         hexapass = makehash(jnrmpass)
-        qurytext = "select keys from roomlist where iden = '" + str(jnrmlink) + "'"
+        qurytext = "select HashedPassword from roomlist where RoomIdentity = '" + str(jnrmlink) + "'"
         roomdata = fetcqury(qurytext)
         password = roomdata[0]
         if hexapass == password:
@@ -53,7 +65,7 @@ def passchek(jnrmlink, jnrmpass):
         return False
 
 def bildrcrd(roomlink):
-    qurytext = "select * from roomlist where iden = '" + str(roomlink) + "'"
+    qurytext = "select * from roomlist where RoomIdentity = '" + str(roomlink) + "'"
     roomdata = fetcqury(qurytext)
     dictinfo = {
         "distinct": {
