@@ -1,15 +1,17 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO
 from libraries.conf import erorlist
 import libraries.make as make
 import libraries.join as join
+import libraries.shut as shut
 
 main = Flask(__name__)
 main.config["SECRET_KEY"] = "2190913f505d968cee4d2b6050f85b36e57ae2fdf765c9f1f9f47fbc59ab7c60a4fcf933d00760e9a6c0d1dc1b0450c1d52e4427976644ff22223445472a3add"
 socketio = SocketIO(main)
 
-def makeroom(makedict):
-    dictinfo = make.generate(makedict)
+@main.route("/makeroom/<roomname>/<roomlink>")
+def makeroom(roomname, roomlink):
+    dictinfo = make.fetcrcrd(roomlink)
     distinct = dictinfo["distinct"]
     basedata = dictinfo["basedata"]
     duration = dictinfo["duration"]
@@ -18,10 +20,9 @@ def makeroom(makedict):
     return render_template("makeredy.html", distinct=distinct, basedata=basedata,
                            duration=duration, strttime=strttime, stoptime=stoptime)
 
-def joinroom(joindict):
-    session["actiroom"] = joindict["jnrmlink"]
-    session["username"] = joindict["jnrmuser"]
-    ftchinfo = join.generate(joindict["jnrmlink"])
+@main.route("/joinroom/<username>/<roomlink>")
+def joinroom(username, roomlink):
+    ftchinfo = join.generate(roomlink)
     distinct = ftchinfo["distinct"]
     basedata = ftchinfo["basedata"]
     duration = ftchinfo["duration"]
@@ -29,15 +30,15 @@ def joinroom(joindict):
     stoptime = duration["stoptime"]
     return render_template("joinredy.html", distinct=distinct, basedata=basedata,
                            duration=duration, strttime=strttime, stoptime=stoptime,
-                           curtuser=joindict["jnrmuser"])
+                           curtuser=username)
 
 @main.route("/sesskill/")
 def sesskill():
     if "username" in session:
         session.pop("username", None)
-        return mainmenu(erorlist["logedout"])
+        return render_template("sesskill.html")
     else:
-        return mainmenu(erorlist["exprsess"])
+        return redirect(url_for("exprsess"))
 
 @main.route("/actiroom/<roomname>/<roomlink>/", methods=["GET","POST"])
 def actiroom(roomname, roomlink):
@@ -45,11 +46,36 @@ def actiroom(roomname, roomlink):
         return render_template("actiroom.html", roomlink=roomlink,
                                roomname=roomname, curtuser=session["username"])
     else:
-        return mainmenu(erorlist["exprsess"])
+        return redirect(url_for("exprsess"))
 
-@main.route("/shutroom/")
-def shutroom():
-    return mainmenu(erorlist["killroom"])
+@main.route("/exprsess/")
+def exprsess():
+    return render_template("exprsess.html")
+
+@main.route("/shutroom/<username>/<roomlink>")
+def shutroom(username, roomlink):
+    dictinfo = {
+        "username": username,
+        "roomlink": roomlink,
+    }
+    shut.generate(dictinfo)
+    return render_template("shutroom.html")
+
+@main.route("/shutkick/")
+def shutkick():
+    if "username" in session:
+        #session.pop("username", None)
+        return render_template("shutkick.html")
+    else:
+        return redirect(url_for("exprsess"))
+
+@main.route("/timekick/")
+def timekick():
+    if "username" in session:
+        #session.pop("username", None)
+        return render_template("timekick.html")
+    else:
+        return redirect(url_for("exprsess"))
 
 @main.route("/", methods=["GET","POST"])
 def mainmenu(erormesg=""):
@@ -74,7 +100,8 @@ def mainmenu(erormesg=""):
                     "mkrmownr": mkrmownr,
                     "mkrmpass": mkrmpass,
                 }
-                return makeroom(makedict)
+                roomlink = make.generate(makedict)
+                return redirect(url_for("makeroom", roomname=mkrmname, roomlink=roomlink))
             return render_template("homepage.html", erormesg=erormesg)
         elif "joinbutn" in request.form:
             jnrmlink = request.form["jnrmlink"]
@@ -95,18 +122,22 @@ def mainmenu(erormesg=""):
                     if join.timevald(jnrmlink) is False:
                         erormesg = erorlist["expiroom"]
                     else:
-                        if join.passchek(jnrmlink, jnrmpass) is False:
-                            erormesg = erorlist["wrngpass"]
+                        if join.shutvald(jnrmlink) is True:
+                            erormesg = erorlist["roomshut"]
                         else:
-                            joindict = {
-                                "jnrmlink": jnrmlink,
-                                "jnrmuser": jnrmuser,
-                                "jnrmpass": jnrmpass,
-                            }
-                            print(joindict)
-                            session["username"] = jnrmuser
-                            session["actiroom"] = jnrmlink
-                            return joinroom(joindict)
+                            if join.passchek(jnrmlink, jnrmpass) is False:
+                                erormesg = erorlist["wrngpass"]
+                            else:
+                                joindict = {
+                                    "jnrmlink": jnrmlink,
+                                    "jnrmuser": jnrmuser,
+                                    "jnrmpass": jnrmpass,
+                                }
+                                print(joindict)
+                                session["username"] = jnrmuser
+                                session["actiroom"] = jnrmlink
+                                return redirect(url_for("joinroom", username=jnrmuser, roomlink=jnrmlink))
+                            return render_template("homepage.html", erormesg=erormesg)
                         return render_template("homepage.html", erormesg=erormesg)
                     return render_template("homepage.html", erormesg=erormesg)
                 return render_template("homepage.html", erormesg=erormesg)
@@ -117,13 +148,25 @@ def mainmenu(erormesg=""):
 def mailrecv():
     print("Message was received!!!")
 
+@socketio.on("shutkick")
+def shutkick_event():
+    socketio.emit("shutkick")
+
 @socketio.on("sendevnt")
 def handle_my_custom_event(jsonobjc):
     if "username" in session:
-        print("Received my event: " + str(jsonobjc))
-        socketio.emit("response", jsonobjc, callback=mailrecv)
+        #print(session)
+        roomlink = jsonobjc["roomlink"]
+        if join.timevald(roomlink) is True:
+            if join.shutvald(roomlink) is False:
+                print("Received my event: " + str(jsonobjc))
+                socketio.emit("response", jsonobjc, callback=mailrecv)
+            else:
+                return redirect(url_for("shutkick"))
+        else:
+            return redirect(url_for("timekick"))
     else:
-        return mainmenu(erorlist["exprsess"])
+        return redirect(url_for("exprsess"))
 
 if __name__ == "__main__":
     socketio.run(main, host="0.0.0.0", port=6969, debug=True)
