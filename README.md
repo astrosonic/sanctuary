@@ -17,10 +17,10 @@ A secure synchronous lightweight chatroom with zero logging and total transience
 * State-of-the-art chatroom user session management
 
 ## Screenshots
-![Homepage](/pictures/snctry_homepage.png)
-![Making a chatroom](/pictures/snctry_makeroom.png)
-![Joining a chatroom](/pictures/snctry_joinroom.png)
-![Active chatroom](/pictures/snctry_chatroom.png)
-![Purging a chatroom](/pictures/snctry_shutroom.png)
-![Logging out](/pictures/snctry_sesskill.png)
-![Accessing invalidated session](/pictures/snctry_exprsess.png)
+![Homepage](pictures/snctry_homepage.png)
+![Making a chatroom](pictures/snctry_makeroom.png)
+![Joining a chatroom](pictures/snctry_joinroom.png)
+![Active chatroom](pictures/snctry_chatroom.png)
+![Purging a chatroom](pictures/snctry_shutroom.png)
+![Logging out](pictures/snctry_sesskill.png)
+![Accessing invalidated session](pictures/snctry_exprsess.png)
