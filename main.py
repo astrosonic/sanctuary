@@ -177,4 +177,4 @@ def handle_my_custom_event(jsonobjc):
         return redirect(url_for("exprsess"))
 
 if __name__ == "__main__":
-    socketio.run(main, host="0.0.0.0", port=6969, debug=True)
+    socketio.run(main, host="127.0.0.1", port=6969, debug=True)

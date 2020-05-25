@@ -67,18 +67,22 @@
                             var mailbody = $('input.mailbody').val()
                             var curtdate = new Date();
                             var datetime = curtdate.getHours() + ":" + curtdate.getMinutes() + ":" + curtdate.getSeconds();
-                            socket.emit
-                            (
-                                'sendevnt',
-                                {
-                                    username : username,
-                                    mailbody : mailbody,
-                                    datetime : datetime,
-                                    roomname : '{{ roomname }}',
-                                    roomlink : '{{ roomlink }}',
-                                }
-                            )
-                            $('input.mailbody').val('').focus()
+                            if (!mailbody)
+                                return
+                            {
+                                socket.emit
+                                (
+                                    'sendevnt',
+                                    {
+                                        username : username,
+                                        mailbody : mailbody,
+                                        datetime : datetime,
+                                        roomname : '{{ roomname }}',
+                                        roomlink : '{{ roomlink }}',
+                                    }
+                                )
+                                $('input.mailbody').val('').focus()
+                            }
                         }
                     )
                 }
@@ -96,7 +100,7 @@
                             $('div.mailhold').append
                             (
                                 '<article class="uk-comment uk-background-secondary uk-border-rounded">' +
-                                '<header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>' +
+                                '<header class="uk-comment-header uk-grid-medium uk-grid">' +
                                 '<div class="uk-width-auto">' +
                                 '<img class="uk-comment-avatar uk-border-rounded" src="{{ url_for("static", filename="imgs/avtrgrfx.jpg") }}" width="80" height="80" alt="">' +
                                 '</div>' +
