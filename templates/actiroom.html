@@ -67,6 +67,8 @@
                             var mailbody = $('input.mailbody').val()
                             var curtdate = new Date();
                             var datetime = curtdate.getHours() + ":" + curtdate.getMinutes() + ":" + curtdate.getSeconds();
+                            if (!mailbody)
+                                return
                             socket.emit
                             (
                                 'sendevnt',
