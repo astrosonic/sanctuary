@@ -41,8 +41,9 @@
             <br/>
             <div>
                 <div class="uk-card uk-card-default uk-card-small uk-card-body uk-border-rounded" style="background-color: #333333;">
+                    <button id="copyBtn" class="uk-button uk-button-small uk-align-right" onclick="copyId()">Copy</button>
                     <h4 class="uk-margin-remove bossnorm secocolr">Joining link</h4>
-                    <h1 class="uk-margin-remove headnorm primcolr" style="word-wrap: break-word;">{{ distinct["identity"] }}</h1>
+                    <h1 id="chatroomId" class="uk-margin-remove headnorm primcolr" style="word-wrap: break-word;">{{ distinct["identity"] }}</h1>
                 </div>
             </div>
             <br/>
@@ -77,5 +78,21 @@
         </div>
         <br/>
     </body>
+    <script>
+        function copyId() {
+            var copyText = document.getElementById("chatroomId");
+            var temp = document.createElement("textarea");
+            document.body.appendChild(temp);
+            temp.value = copyText.innerText;
+            temp.select();
+            temp.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            var copyBtn = document.getElementById("copyBtn")
+            copyBtn.innerHTML = "Copied";
+            copyBtn.classList.add("uk-button-secondary");
+            // alert("Copied the text: " + temp.value);
+            document.body.removeChild(temp);
+        }
+    </script>
 </html>
 
