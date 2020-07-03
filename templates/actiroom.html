@@ -32,8 +32,8 @@
                                     <span class="uk-float-right">
                                         <button type="submit" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Send chat; pos: bottom;"><span uk-icon="icon: check"></span></button>
                                         <button onclick="location.reload()" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Refresh page; pos: bottom;"><span uk-icon="icon: refresh"></span></button>
-                                        <button onclick="window.location.href = '{{ url_for("sesskill") }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Leave room; pos: bottom;"><span uk-icon="icon: close"></span></button>
-                                        <button onclick="window.location.href = '{{ url_for("shutroom", username=curtuser, roomlink=roomlink) }}'" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Purge room; pos: bottom;"><span uk-icon="icon: trash"></span></button>
+                                        <button onclick="confirm_exit()" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Leave room; pos: bottom;"><span uk-icon="icon: close"></span></button>
+                                        <button onclick="confirm_purge()" class="uk-button uk-border-rounded sendbutn iconbutn" uk-tooltip="title: Purge room; pos: bottom;"><span uk-icon="icon: trash"></span></button>
                                     </span>
                                 </p>
                             </form>
@@ -45,6 +45,18 @@
         <br/>
         <script type="text/javascript">
             var socket = io.connect('http://' + document.domain + ':' + location.port);
+            function confirm_exit()
+            {
+                var r = confirm("Are you sure want to exit?");
+                if(r==true){
+                    window.location.href = '{{ url_for("sesskill") }}';}
+            }
+             function confirm_purge()
+            {
+                var r = confirm("Are you sure want to purge this room?\nAll active room members may get affected");
+                if(r==true){
+                window.location.href = '{{ url_for("shutroom", username=curtuser, roomlink=roomlink) }}';}
+            }
             socket.on
             (
                 'connect',
