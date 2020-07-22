@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>Sanctuary</title>
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/fontsome.css") }}" />
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/adminlte.css") }}" />
+        <style>
+            @font-face {
+                font-family: "Inter";
+                font-weight: 400;
+                src: url("{{ url_for("static", filename="font/rlar.ttf") }}");
+            }
+            @font-face {
+                font-family: "Inter";
+                font-weight: 700;
+                src: url("{{ url_for("static", filename="font/bold.ttf") }}");
+            }
+            .normelem{
+                font-family: "Inter", sans-serif;
+                font-weight: 400;
+            }
+            .headelem {
+                font-family: "Inter", sans-serif;
+                font-weight: 700;
+            }
+            body {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+        </style>
+    </head>
+    <body class="hold-transition layout-top-nav layout-navbar-fixed noselect text-sm layout-footer-fixed" onload="$('#givename').modal('show'); startTime(); document.getElementById('username').value = ''; document.getElementById('roomiden').value = '';">
+
+        <div class="wrapper">
+            <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
+                <div class="container">
+                    <a class="navbar-brand">
+                        <img src="{{ url_for("static", filename="imgs/datalogo.svg") }}" class="brand-image img-circle" style="filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);">
+                        <span class="brand-text headelem">Sanctuary</span>
+                    </a>
+                    <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" onclick="location.reload()">
+                                <i class="fas fa-sync"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="content-wrapper">
+                <div class="content">
+                    <div class="container">
+                        <br/>
+                        <div class="row mb-2" id="headtext">
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Username</p>
+                                <h1 class="m-0 text-dark headelem" id="userhead">Sanctuary</h1>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Identity</p>
+                                <h1 class="m-0 text-dark headelem" id="idenhead">DEADCAFE</h1>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Time</p>
+                                <h1 class="m-0 text-dark headelem" id="timehead">DEADCAFE</h1>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="card card-olive direct-chat direct-chat-olive" id="chatboxe">
+                            <div class="card-header">
+                                <h3 class="card-title headelem">Chatroom</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-toggle="tooltip"><i class="fas fa-door-open"></i></button>
+                                    <button type="button" class="btn btn-tool" data-toggle="tooltip"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body" id="mesgarea">
+                                <div class="direct-chat-messages" style="height: 100%;">
+                                </div>
+                            </div>
+                            <div class="card-footer" style="padding-left: 10px; padding-right: 10px;">
+                                <form onsubmit="FetchMessageFromTextbox()" action="javascript:;">
+                                    <div class="input-group">
+                                        <input type="text" name="message" placeholder="Enter your message here" id="textmesg" class="form-control normelem">
+                                        <span class="input-group-append">
+                                            <button type="submit" class="btn bg-olive headelem"><i class="fas fa-share"></i></button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="main-footer bg-light">
+                <div class="container">
+                    <div class="float-right d-none d-sm-inline normelem">
+                        Created with <i class="fas fa-heart"></i> by <span class="headelem" onclick="window.location.href = 'https://github.com/astrosonic/'">AstroSonic</span>
+                    </div>
+                    <span class="headelem">Sanctuary v22072020. </span><span onclick="window.location.href = 'https://github.com/astrosonic/sanctuary'" class="normelem">Contribute</span> here.
+                </div>
+            </footer>
+        </div>
+
+        <div class="modal fade" id="givename" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Welcome to Sanctuary!</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem" style="margin-bottom: 5px;">You need to provide an alias and a chatroom key to continue.</p>
+                        <ul class="normelem">
+                            <li>The username should not consist of spaces</li>
+                            <li>The username is mandatory to verify identity</li>
+                            <li>Enter a room key shared with you if you are joining</li>
+                            <li>Generate a room key and share to create a chatroom</li>
+                            <li>The room key should be 8-char hexadecimal string</li>
+                        </ul>
+                        <input type="text" id="username" placeholder="Enter your username" class="form-control normelem">
+                        <br/>
+                        <input type="text" id="roomiden" placeholder="Enter your chatroom key" class="form-control normelem">
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="GenerateRoom()">Generate new chatroom key</button>
+                        <button type="button" class="btn btn-default" onclick="SaveUserName()">Continue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="sockfail" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Connection failed</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">A connection to the WebSocket server could not be established. Please refresh the page and try again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="userkick" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">You were removed from the chatroom. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="userstop" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">The chatroom was stopped and everyone was removed. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="userexit" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">You left the chatroom voluntarily. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
+        <script>
+            let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
+            function startTime()
+            {
+                let curtdate = new Date();
+                let hour = curtdate.getHours(); let mint = curtdate.getMinutes(); let secs = curtdate.getSeconds();
+                mint = checkTime(mint); secs = checkTime(secs);
+                document.getElementById("timehead").innerHTML = hour + ":" + mint + ":" + secs;
+                let time = setTimeout(startTime, 500);
+            }
+            function checkTime(indx)
+            {
+                if (indx < 10)
+                {
+                    indx = "0" + indx;
+                }
+                return indx;
+            }
+            function GenerateRoom() {
+                let rand = "";
+                let lent = 8;
+                let list = "0123456789abcdef";
+                for (let indx = lent; indx > 0; indx--)
+                {
+                    rand += list[Math.floor(Math.random() * list.length)];
+                }
+                document.getElementById("roomiden").value = rand;
+            }
+            function SaveUserName() {
+                let username = document.getElementById("username").value;
+                let roomiden = document.getElementById("roomiden").value;
+                if (username != "" && roomiden != "")
+                {
+                    if (!(/\s/.test(username) || /\s/.test(roomiden) || roomiden.length != 8) && roomiden.match(/^[a-f0-9]{8}$/i))
+                    {
+                        sessionStorage.setItem("username",username); sessionStorage.setItem("roomiden",roomiden);
+                        $('#givename').modal('hide');
+                        document.getElementById("username").value = "";
+                        document.getElementById("roomiden").value = "";
+                        document.getElementById("userhead").innerText = username;
+                        document.getElementById("idenhead").innerText = roomiden.toUpperCase();
+                    }
+                }
+            }
+            function FetchMessageFromTextbox()
+            {
+                if (webesock.readyState == 3)
+                {
+                    $("#sockfail").modal("show");
+                }
+                else
+                {
+                    let textmesg = document.getElementById("textmesg").value;
+                    if (textmesg != "")
+                    {
+                        if (textmesg == "/stop")
+                        {
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            document.getElementById("chatboxe").remove();
+                            document.getElementById("headtext").remove();
+                            sessionStorage.removeItem("username");
+                            sessionStorage.removeItem("roomiden");
+                            $("#userstop").modal("show");
+                        }
+                        else if (textmesg == "/exit")
+                        {
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
+                            document.getElementById("chatboxe").remove();
+                            document.getElementById("headtext").remove();
+                            sessionStorage.removeItem("username");
+                            sessionStorage.removeItem("roomiden");
+                            $("#userexit").modal("show");
+                        }
+                        else if (textmesg.includes("/kick"))
+                        {
+                            if (textmesg.includes(sessionStorage.getItem("username")))
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                                document.getElementById("textmesg").value = "";
+                            }
+                            else
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                                document.getElementById("textmesg").value = "";
+                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            }
+                        }
+                        else
+                        {
+                            let curtdate = new Date();
+                            let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
+                            $("div.direct-chat-messages").append(modifdom);
+                            document.getElementById("textmesg").value = "";
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                        }
+                    }
+                }
+            }
+            webesock.onmessage = function (event)
+            {
+                let data = JSON.parse(event.data);
+                if (!(data.username == sessionStorage.getItem("username")))
+                {
+                    if (data.roomiden == sessionStorage.getItem("roomiden"))
+                    {
+                        if (data.username != null && data.textmesg != null)
+                        {
+                            if (data.textmesg.includes("/kick") == true)
+                            {
+                                if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                                {
+                                    document.getElementById("chatboxe").remove();
+                                    document.getElementById("headtext").remove();
+                                    sessionStorage.removeItem("username");
+                                    sessionStorage.removeItem("roomiden");
+                                    $("#userkick").modal("show");
+                                }
+                                else if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
+                                        "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + data.textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
+                                        "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom);
+                                }
+                            }
+                            else if (data.textmesg == "/stop")
+                            {
+                                document.getElementById("chatboxe").remove();
+                                document.getElementById("headtext").remove();
+                                sessionStorage.removeItem("username");
+                                sessionStorage.removeItem("roomiden");
+                                $("#userstop").modal("show");
+                            }
+                            else
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
+                                    "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + data.textmesg + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <script src="{{ url_for("static", filename="jscn/bootstrap.bundle.js") }}"></script>
+        <script src="static/jscn/adminlte.js"></script>
+    </body>
+</html>
