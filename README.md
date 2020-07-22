@@ -1,7 +1,14 @@
-# sanctuary
-A secure synchronous lightweight chatroom with zero logging and total transience
+<h1 align="center">sanctuary</h1>
+<p align="center">A secure synchronous lightweight chatroom with zero logging and total transience</p>
 
-## Screenshots
+<p align="center">
+    <img src="https://img.shields.io/github/issues/astrosonic/sanctuary?style=flat-square&logo=appveyor&color=teal">
+    <img src="https://img.shields.io/github/forks/astrosonic/sanctuary?style=flat-square&logo=appveyor&color=teal">
+    <img src="https://img.shields.io/github/stars/astrosonic/sanctuary?style=flat-square&logo=appveyor&color=teal">
+    <img src="https://img.shields.io/github/license/astrosonic/sanctuary?style=flat-square&logo=appveyor&color=teal">
+</p>
+
+## Simply elegant
 ![Homepage](pictures/cleanimg.png)
 
 ## Built on
