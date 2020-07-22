@@ -132,7 +132,7 @@
 
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
-            let webesock = new WebSocket("ws://127.0.0.1:6789/");
+            let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
             function GenerateRoom() {
                 let rand = "";
                 let lent = 8;
