@@ -7,14 +7,23 @@
         <title>Sanctuary</title>
         <link rel="stylesheet" href="{{ url_for("static", filename="css3/fontsome.css") }}" />
         <link rel="stylesheet" href="{{ url_for("static", filename="css3/adminlte.css") }}" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
         <style>
+            @font-face {
+                font-family: "Inter";
+                font-weight: 400;
+                src: url("{{ url_for("static", filename="font/rlar.ttf") }}");
+            }
+            @font-face {
+                font-family: "Inter";
+                font-weight: 700;
+                src: url("{{ url_for("static", filename="font/bold.ttf") }}");
+            }
             .normelem{
-                font-family: 'Inter', sans-serif;
+                font-family: "Inter", sans-serif;
                 font-weight: 400;
             }
             .headelem {
-                font-family: 'Inter', sans-serif;
+                font-family: "Inter", sans-serif;
                 font-weight: 700;
             }
             body {
