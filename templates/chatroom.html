@@ -27,7 +27,7 @@
             }
         </style>
     </head>
-    <body class="hold-transition layout-top-nav layout-navbar-fixed noselect text-sm layout-footer-fixed" onload="$('#givename').modal('show');">
+    <body class="hold-transition layout-top-nav layout-navbar-fixed noselect text-sm layout-footer-fixed" onload="$('#givename').modal('show'); startTime(); document.getElementById('username').value = ''; document.getElementById('roomiden').value = '';">
 
         <div class="wrapper">
             <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
@@ -47,9 +47,24 @@
             </nav>
 
             <div class="content-wrapper">
-                <br/>
                 <div class="content">
                     <div class="container">
+                        <br/>
+                        <div class="row mb-2" id="headtext">
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Username</p>
+                                <h1 class="m-0 text-dark headelem" id="userhead">Sanctuary</h1>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Identity</p>
+                                <h1 class="m-0 text-dark headelem" id="idenhead">DEADCAFE</h1>
+                            </div>
+                            <div class="col-sm-4">
+                                <p class="normelem" style="margin-bottom: 0px;">Time</p>
+                                <h1 class="m-0 text-dark headelem" id="timehead">DEADCAFE</h1>
+                            </div>
+                        </div>
+                        <br/>
                         <div class="card card-olive direct-chat direct-chat-olive" id="chatboxe">
                             <div class="card-header">
                                 <h3 class="card-title headelem">Chatroom</h3>
@@ -82,7 +97,7 @@
                     <div class="float-right d-none d-sm-inline normelem">
                         Created with <i class="fas fa-heart"></i> by <span class="headelem" onclick="window.location.href = 'https://github.com/astrosonic/'">AstroSonic</span>
                     </div>
-                    <span class="headelem">Sanctuary v10072020. </span><span onclick="window.location.href = 'https://github.com/astrosonic/sanctuary'" class="normelem">Contribute</span> here.
+                    <span class="headelem">Sanctuary v22072020. </span><span onclick="window.location.href = 'https://github.com/astrosonic/sanctuary'" class="normelem">Contribute</span> here.
                 </div>
             </footer>
         </div>
@@ -181,6 +196,22 @@
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
+            function startTime()
+            {
+                let curtdate = new Date();
+                let hour = curtdate.getHours(); let mint = curtdate.getMinutes(); let secs = curtdate.getSeconds();
+                mint = checkTime(mint); secs = checkTime(secs);
+                document.getElementById("timehead").innerHTML = hour + ":" + mint + ":" + secs;
+                let time = setTimeout(startTime, 500);
+            }
+            function checkTime(indx)
+            {
+                if (indx < 10)
+                {
+                    indx = "0" + indx;
+                }
+                return indx;
+            }
             function GenerateRoom() {
                 let rand = "";
                 let lent = 8;
@@ -202,6 +233,8 @@
                         $('#givename').modal('hide');
                         document.getElementById("username").value = "";
                         document.getElementById("roomiden").value = "";
+                        document.getElementById("userhead").innerText = username;
+                        document.getElementById("idenhead").innerText = roomiden.toUpperCase();
                     }
                 }
             }
@@ -220,14 +253,16 @@
                         {
                             webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
                             document.getElementById("chatboxe").remove();
+                            document.getElementById("headtext").remove();
                             sessionStorage.removeItem("username");
                             sessionStorage.removeItem("roomiden");
                             $("#userstop").modal("show");
                         }
                         else if (textmesg == "/exit")
                         {
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
                             document.getElementById("chatboxe").remove();
+                            document.getElementById("headtext").remove();
                             sessionStorage.removeItem("username");
                             sessionStorage.removeItem("roomiden");
                             $("#userexit").modal("show");
@@ -287,11 +322,12 @@
                                 if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
                                 {
                                     document.getElementById("chatboxe").remove();
+                                    document.getElementById("headtext").remove();
                                     sessionStorage.removeItem("username");
                                     sessionStorage.removeItem("roomiden");
                                     $("#userkick").modal("show");
                                 }
-                                if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
+                                else if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
                                 {
                                     let curtdate = new Date();
                                     let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
@@ -306,6 +342,7 @@
                             else if (data.textmesg == "/stop")
                             {
                                 document.getElementById("chatboxe").remove();
+                                document.getElementById("headtext").remove();
                                 sessionStorage.removeItem("username");
                                 sessionStorage.removeItem("roomiden");
                                 $("#userstop").modal("show");
