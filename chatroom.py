@@ -18,13 +18,13 @@ async def notify_mesej(username, roomiden, textmesg):
 
 async def register(websocket):
     USERS.add(websocket)
-    print(" > [" + str(time.ctime()) + "] [USERJOIN] A user just joined the Sanctuary!")
+    print(" > [" + str(time.ctime()) + "] [USERJOIN] User just joined the Sanctuary")
 
 
 async def unregister(websocket):
     USERS.remove(websocket)
     dir(websocket)
-    print(" > [" + str(time.ctime()) + "] [USERLEFT] A user just left the Sanctuary!")
+    print(" > [" + str(time.ctime()) + "] [USERLEFT] User just left the Sanctuary")
 
 
 async def chatroom(websocket, path):
@@ -32,7 +32,7 @@ async def chatroom(websocket, path):
     try:
         async for message in websocket:
             data = json.loads(message)
-            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]).upper() + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]))
+            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]).upper() + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
             await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
     finally:
         await unregister(websocket)
