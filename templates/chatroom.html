@@ -162,6 +162,22 @@
             </div>
         </div>
 
+        <div class="modal fade" id="userexit" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">You left the chatroom voluntarily. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
@@ -204,7 +220,43 @@
                         {
                             webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
                             document.getElementById("chatboxe").remove();
+                            sessionStorage.removeItem("username");
+                            sessionStorage.removeItem("roomiden");
                             $("#userstop").modal("show");
+                        }
+                        else if (textmesg == "/exit")
+                        {
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
+                            document.getElementById("chatboxe").remove();
+                            sessionStorage.removeItem("username");
+                            sessionStorage.removeItem("roomiden");
+                            $("#userexit").modal("show");
+                        }
+                        else if (textmesg.includes("/kick"))
+                        {
+                            if (textmesg.includes(sessionStorage.getItem("username")))
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                                document.getElementById("textmesg").value = "";
+                            }
+                            else
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                                document.getElementById("textmesg").value = "";
+                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            }
                         }
                         else
                         {
@@ -230,14 +282,32 @@
                     {
                         if (data.username != null && data.textmesg != null)
                         {
-                            if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                            if (data.textmesg.includes("/kick") == true)
                             {
-                                document.getElementById("chatboxe").remove();
-                                $("#userkick").modal("show");
+                                if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                                {
+                                    document.getElementById("chatboxe").remove();
+                                    sessionStorage.removeItem("username");
+                                    sessionStorage.removeItem("roomiden");
+                                    $("#userkick").modal("show");
+                                }
+                                if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
+                                        "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + data.textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
+                                        "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom);
+                                }
                             }
                             else if (data.textmesg == "/stop")
                             {
                                 document.getElementById("chatboxe").remove();
+                                sessionStorage.removeItem("username");
+                                sessionStorage.removeItem("roomiden");
                                 $("#userstop").modal("show");
                             }
                             else
@@ -247,7 +317,7 @@
                                     "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
                                     "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                    "<div class='direct-chat-text normelem'>" + data.textmesg + "</div>" + "</div>";
+                                    "<div class='direct-chat-text normelem text-justify'>" + data.textmesg + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom);
                             }
                         }
