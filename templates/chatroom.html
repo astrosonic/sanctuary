@@ -27,7 +27,7 @@
             }
         </style>
     </head>
-    <body class="hold-transition layout-top-nav noselect text-sm layout-footer-fixed" onload="$('#givename').modal('show');">
+    <body class="hold-transition layout-top-nav layout-navbar-fixed noselect text-sm layout-footer-fixed" onload="$('#givename').modal('show');">
 
         <div class="wrapper">
             <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
@@ -38,7 +38,7 @@
                     </a>
                     <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
                         <li class="nav-item dropdown">
-                            <a class="nav-link">
+                            <a class="nav-link" onclick="location.reload()">
                                 <i class="fas fa-sync"></i>
                             </a>
                         </li>
@@ -50,7 +50,7 @@
                 <br/>
                 <div class="content">
                     <div class="container">
-                        <div class="card card-olive direct-chat direct-chat-olive">
+                        <div class="card card-olive direct-chat direct-chat-olive" id="chatboxe">
                             <div class="card-header">
                                 <h3 class="card-title headelem">Chatroom</h3>
                                 <div class="card-tools">
@@ -130,6 +130,38 @@
             </div>
         </div>
 
+        <div class="modal fade" id="userkick" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">You were removed from the chatroom. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="userstop" style="display: none;" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-olive">
+                        <h4 class="modal-title headelem">Warning</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p class="normelem text-justify" style="margin-bottom: 5px;">The chatroom was stopped and everyone was removed. Please refresh the page to try joining again.</p>
+                    </div>
+                    <div class="modal-footer justify-content-between bg-olive">
+                        <button type="button" class="btn btn-default" onclick="location.reload();">Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
@@ -152,6 +184,8 @@
                     {
                         sessionStorage.setItem("username",username); sessionStorage.setItem("roomiden",roomiden);
                         $('#givename').modal('hide');
+                        document.getElementById("username").value = "";
+                        document.getElementById("roomiden").value = "";
                     }
                 }
             }
@@ -166,15 +200,24 @@
                     let textmesg = document.getElementById("textmesg").value;
                     if (textmesg != "")
                     {
-                        let curtdate = new Date();
-                        let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
-                            "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
-                            "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
-                            "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                            "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
-                        $("div.direct-chat-messages").append(modifdom);
-                        document.getElementById("textmesg").value = "";
-                        webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                        if (textmesg == "/stop")
+                        {
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            document.getElementById("chatboxe").remove();
+                            $("#userstop").modal("show");
+                        }
+                        else
+                        {
+                            let curtdate = new Date();
+                            let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
+                                "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
+                            $("div.direct-chat-messages").append(modifdom);
+                            document.getElementById("textmesg").value = "";
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                        }
                     }
                 }
             }
@@ -187,13 +230,26 @@
                     {
                         if (data.username != null && data.textmesg != null)
                         {
-                            let curtdate = new Date();
-                            let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
-                                "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
-                                "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
-                                "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                "<div class='direct-chat-text normelem'>" + data.textmesg + "</div>" + "</div>";
-                            $("div.direct-chat-messages").append(modifdom);
+                            if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                            {
+                                document.getElementById("chatboxe").remove();
+                                $("#userkick").modal("show");
+                            }
+                            else if (data.textmesg == "/stop")
+                            {
+                                document.getElementById("chatboxe").remove();
+                                $("#userstop").modal("show");
+                            }
+                            else
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
+                                    "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem'>" + data.textmesg + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom);
+                            }
                         }
                     }
                 }
