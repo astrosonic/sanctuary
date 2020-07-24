@@ -110,7 +110,7 @@ $ python3 chatroom.py -c 9696 -4
 - The argument for the websockets server (the one after `-c` suffix) should be the same as that argument for the chatroom server (the one after `-c` suffix).
 - Make a note of your device's IP address - keeping in mind the IP version you chose while initiating the servers and ensure if your device is reachable in your network.
 - To access the chatroom,
-    - Devices in your network can simply head over to ```http://<YOUR-LOCAL-IP-ADDRESS>/6969/``` on a web browser.
+    - Devices in your network can simply head over to ```http://<YOUR-LOCAL-IP-ADDRESS>:6969/``` on a web browser.
     - To ensure that the server is discoverable across the internet, enable port forwarding or use the IPv6 mode.
     - Simply replace the port number provided here with the one that you provided while initiating the chatroom server - Specifically the one after the `-s` suffix.
     - The IPv6 mode is natively supported though it is really upto your internet service provider if IPv6 addresses are made available to you or not.
