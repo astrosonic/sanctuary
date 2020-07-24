@@ -125,10 +125,11 @@
                         <p class="normelem" style="margin-bottom: 5px;">You need to provide an alias and a chatroom key to continue.</p>
                         <ul class="normelem">
                             <li>The username should not consist of spaces</li>
-                            <li>The username is mandatory to verify identity</li>
-                            <li>Enter a room key shared with you if you are joining</li>
-                            <li>Generate a room key and share to create a chatroom</li>
-                            <li>The room key should be 8-char hexadecimal string</li>
+                            <li>The username is mandatory for user identification</li>
+                            <li>Enter a room key and password shared with you to join</li>
+                            <li>Generate a room key and share it with password to add</li>
+                            <li>The room key must be in 8-char uppercase hexadecimal</li>
+                            <li>The password must be in 8-char uppercase hexadecimal</li>
                         </ul>
                         <input type="text" id="username" placeholder="Enter your username" class="form-control normelem">
                         <br/>
@@ -211,9 +212,7 @@
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
-            sessionStorage.removeItem("username");
-            sessionStorage.removeItem("password");
-            sessionStorage.removeItem("roomiden");
+            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
             function startTime()
             {
                 let curtdate = new Date();
@@ -231,10 +230,8 @@
                 return indx;
             }
             function GenerateRoom() {
-                let randroom = "";
-                let randpass = "";
-                let lent = 8;
-                let list = "0123456789ABCDEF";
+                let randroom = ""; let randpass = "";
+                let lent = 8; let list = "0123456789ABCDEF";
                 for (let indx = lent; indx > 0; indx--)
                 {
                     randroom += list[Math.floor(Math.random() * list.length)];
@@ -256,16 +253,9 @@
                     {
                         if (roomiden.match(/^[A-F0-9]{8}$/i) && password.match(/^[A-F0-9]{8}$/i))
                         {
-                            sessionStorage.setItem("username", username);
-                            sessionStorage.setItem("roomiden", roomiden);
-                            sessionStorage.setItem("password", password);
-                            $('#givename').modal('hide');
-                            document.getElementById("username").value = "";
-                            document.getElementById("roomiden").value = "";
-                            document.getElementById("password").value = "";
-                            document.getElementById("userhead").innerText = username;
-                            document.getElementById("idenhead").innerText = roomiden;
-                            document.getElementById("passhead").innerText = password;
+                            sessionStorage.setItem("username", username); sessionStorage.setItem("roomiden", roomiden); sessionStorage.setItem("password", password);
+                            $('#givename').modal('hide'); document.getElementById("username").value = ""; document.getElementById("roomiden").value = ""; document.getElementById("password").value = "";
+                            document.getElementById("userhead").innerText = username; document.getElementById("idenhead").innerText = roomiden; document.getElementById("passhead").innerText = password;
                         }
                     }
                 }
@@ -283,21 +273,18 @@
                     {
                         if (textmesg == "/stop")
                         {
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
-                            document.getElementById("chatboxe").remove();
-                            document.getElementById("headtext").remove();
-                            sessionStorage.removeItem("username");
-                            sessionStorage.removeItem("roomiden");
-                            $("#userstop").modal("show");
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                         }
                         else if (textmesg == "/exit")
                         {
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
-                            document.getElementById("chatboxe").remove();
-                            document.getElementById("headtext").remove();
-                            sessionStorage.removeItem("username");
-                            sessionStorage.removeItem("roomiden");
-                            $("#userexit").modal("show");
+                            let textmesg = "Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>";
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userexit").modal("show");
                         }
                         else if (textmesg.includes("/kick"))
                         {
@@ -309,8 +296,7 @@
                                     "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
-                                $("div.direct-chat-messages").append(modifdom);
-                                document.getElementById("textmesg").value = "";
+                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
                             }
                             else
                             {
@@ -320,9 +306,9 @@
                                     "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
-                                $("div.direct-chat-messages").append(modifdom);
-                                document.getElementById("textmesg").value = "";
-                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                             }
                         }
                         else
@@ -333,9 +319,9 @@
                                 "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                 "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                 "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
-                            $("div.direct-chat-messages").append(modifdom);
-                            document.getElementById("textmesg").value = "";
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                         }
                     }
                 }
@@ -349,35 +335,30 @@
                     {
                         if (data.username != null && data.textmesg != null)
                         {
-                            if (data.textmesg.includes("/kick") == true)
+                            let textmesg = CryptoJS.AES.decrypt(data.textmesg, sessionStorage.getItem("password")).toString(CryptoJS.enc.Utf8);
+                            if (textmesg.includes("/kick") == true)
                             {
-                                if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                                if (textmesg == "/kick " + sessionStorage.getItem("username"))
                                 {
-                                    document.getElementById("chatboxe").remove();
-                                    document.getElementById("headtext").remove();
-                                    sessionStorage.removeItem("username");
-                                    sessionStorage.removeItem("roomiden");
-                                    $("#userkick").modal("show");
+                                    sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                                    document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userkick").modal("show");
                                 }
-                                else if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
+                                else if (!(textmesg.includes(sessionStorage.getItem("username"))))
                                 {
                                     let curtdate = new Date();
                                     let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
                                         "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
                                         "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                         "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + data.textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
                                         "</div>" + "</div>";
                                     $("div.direct-chat-messages").append(modifdom);
                                 }
                             }
-                            else if (data.textmesg == "/stop")
+                            else if (textmesg == "/stop")
                             {
-                                document.getElementById("chatboxe").remove();
-                                document.getElementById("headtext").remove();
-                                sessionStorage.removeItem("username");
-                                sessionStorage.removeItem("roomiden");
-                                $("#userstop").modal("show");
+                                sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                                document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                             }
                             else
                             {
@@ -386,7 +367,7 @@
                                     "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
                                     "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                    "<div class='direct-chat-text normelem text-justify'>" + data.textmesg + "</div>" + "</div>";
+                                    "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom);
                             }
                         }
@@ -395,6 +376,7 @@
             }
         </script>
         <script src="{{ url_for("static", filename="jscn/bootstrap.bundle.js") }}"></script>
-        <script src="static/jscn/adminlte.js"></script>
+        <script src="{{ url_for("static", filename="jscn/adminlte.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/aes.js") }}"></script>
     </body>
 </html>
