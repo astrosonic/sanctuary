@@ -60,15 +60,19 @@
                     <div class="container">
                         <br/>
                         <div class="row mb-2" id="headtext">
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <p class="normelem" style="margin-bottom: 0px;">Username</p>
                                 <h1 class="m-0 text-dark headelem" id="userhead">Sanctuary</h1>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <p class="normelem" style="margin-bottom: 0px;">Identity</p>
                                 <h1 class="m-0 text-dark headelem" id="idenhead">DEADCAFE</h1>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
+                                <p class="normelem" style="margin-bottom: 0px;">Password</p>
+                                <h1 class="m-0 text-dark headelem" id="passhead">DEAFBEEF</h1>
+                            </div>
+                            <div class="col-sm-3">
                                 <p class="normelem" style="margin-bottom: 0px;">Time</p>
                                 <h1 class="m-0 text-dark headelem" id="timehead">DEADCAFE</h1>
                             </div>
@@ -121,17 +125,20 @@
                         <p class="normelem" style="margin-bottom: 5px;">You need to provide an alias and a chatroom key to continue.</p>
                         <ul class="normelem">
                             <li>The username should not consist of spaces</li>
-                            <li>The username is mandatory to verify identity</li>
-                            <li>Enter a room key shared with you if you are joining</li>
-                            <li>Generate a room key and share to create a chatroom</li>
-                            <li>The room key should be 8-char hexadecimal string</li>
+                            <li>The username is mandatory for user identification</li>
+                            <li>Enter a room key and password shared with you to join</li>
+                            <li>Generate a room key and share it with password to add</li>
+                            <li>The room key must be in 8-char uppercase hexadecimal</li>
+                            <li>The password must be in 8-char uppercase hexadecimal</li>
                         </ul>
                         <input type="text" id="username" placeholder="Enter your username" class="form-control normelem">
                         <br/>
                         <input type="text" id="roomiden" placeholder="Enter your chatroom key" class="form-control normelem">
+                        <br/>
+                        <input type="text" id="password" placeholder="Enter a strong password" class="form-control normelem">
                     </div>
                     <div class="modal-footer justify-content-between bg-olive">
-                        <button type="button" class="btn btn-default" onclick="GenerateRoom()">Generate new chatroom key</button>
+                        <button type="button" class="btn btn-default" onclick="GenerateRoom()">Generate</button>
                         <button type="button" class="btn btn-default" onclick="SaveUserName()">Continue</button>
                     </div>
                 </div>
@@ -205,6 +212,7 @@
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
+            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
             function startTime()
             {
                 let curtdate = new Date();
@@ -222,28 +230,33 @@
                 return indx;
             }
             function GenerateRoom() {
-                let rand = "";
-                let lent = 8;
-                let list = "0123456789abcdef";
+                let randroom = ""; let randpass = "";
+                let lent = 8; let list = "0123456789ABCDEF";
                 for (let indx = lent; indx > 0; indx--)
                 {
-                    rand += list[Math.floor(Math.random() * list.length)];
+                    randroom += list[Math.floor(Math.random() * list.length)];
                 }
-                document.getElementById("roomiden").value = rand;
+                for (let indx = lent; indx > 0; indx--)
+                {
+                    randpass += list[Math.floor(Math.random() * list.length)];
+                }
+                document.getElementById("roomiden").value = randroom;
+                document.getElementById("password").value = randpass;
             }
             function SaveUserName() {
                 let username = document.getElementById("username").value;
                 let roomiden = document.getElementById("roomiden").value;
-                if (username != "" && roomiden != "")
+                let password = document.getElementById("password").value;
+                if (username != "" && roomiden != "" && password != "")
                 {
-                    if (!(/\s/.test(username) || /\s/.test(roomiden) || roomiden.length != 8) && roomiden.match(/^[a-f0-9]{8}$/i))
+                    if (!(/\s/.test(username) || /\s/.test(roomiden) || /\s/.test(password)))
                     {
-                        sessionStorage.setItem("username",username); sessionStorage.setItem("roomiden",roomiden);
-                        $('#givename').modal('hide');
-                        document.getElementById("username").value = "";
-                        document.getElementById("roomiden").value = "";
-                        document.getElementById("userhead").innerText = username;
-                        document.getElementById("idenhead").innerText = roomiden.toUpperCase();
+                        if (roomiden.match(/^[A-F0-9]{8}$/i) && password.match(/^[A-F0-9]{8}$/i))
+                        {
+                            sessionStorage.setItem("username", username); sessionStorage.setItem("roomiden", roomiden); sessionStorage.setItem("password", password);
+                            $('#givename').modal('hide'); document.getElementById("username").value = ""; document.getElementById("roomiden").value = ""; document.getElementById("password").value = "";
+                            document.getElementById("userhead").innerText = username; document.getElementById("idenhead").innerText = roomiden; document.getElementById("passhead").innerText = password;
+                        }
                     }
                 }
             }
@@ -260,21 +273,18 @@
                     {
                         if (textmesg == "/stop")
                         {
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
-                            document.getElementById("chatboxe").remove();
-                            document.getElementById("headtext").remove();
-                            sessionStorage.removeItem("username");
-                            sessionStorage.removeItem("roomiden");
-                            $("#userstop").modal("show");
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                         }
                         else if (textmesg == "/exit")
                         {
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:"Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>"}));
-                            document.getElementById("chatboxe").remove();
-                            document.getElementById("headtext").remove();
-                            sessionStorage.removeItem("username");
-                            sessionStorage.removeItem("roomiden");
-                            $("#userexit").modal("show");
+                            let textmesg = "Gotta go now. I will talk to you folks later.<br/><i>This is an automated message on the behalf of " + sessionStorage.getItem("username") + ".</i>";
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                            sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userexit").modal("show");
                         }
                         else if (textmesg.includes("/kick"))
                         {
@@ -286,8 +296,7 @@
                                     "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
-                                $("div.direct-chat-messages").append(modifdom);
-                                document.getElementById("textmesg").value = "";
+                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
                             }
                             else
                             {
@@ -297,9 +306,9 @@
                                     "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
-                                $("div.direct-chat-messages").append(modifdom);
-                                document.getElementById("textmesg").value = "";
-                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                             }
                         }
                         else
@@ -310,9 +319,9 @@
                                 "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                 "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                 "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
-                            $("div.direct-chat-messages").append(modifdom);
-                            document.getElementById("textmesg").value = "";
-                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:textmesg}));
+                            $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                            let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                            webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                         }
                     }
                 }
@@ -326,35 +335,30 @@
                     {
                         if (data.username != null && data.textmesg != null)
                         {
-                            if (data.textmesg.includes("/kick") == true)
+                            let textmesg = CryptoJS.AES.decrypt(data.textmesg, sessionStorage.getItem("password")).toString(CryptoJS.enc.Utf8);
+                            if (textmesg.includes("/kick") == true)
                             {
-                                if (data.textmesg == "/kick " + sessionStorage.getItem("username"))
+                                if (textmesg == "/kick " + sessionStorage.getItem("username"))
                                 {
-                                    document.getElementById("chatboxe").remove();
-                                    document.getElementById("headtext").remove();
-                                    sessionStorage.removeItem("username");
-                                    sessionStorage.removeItem("roomiden");
-                                    $("#userkick").modal("show");
+                                    sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                                    document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userkick").modal("show");
                                 }
-                                else if (!(data.textmesg.includes(sessionStorage.getItem("username"))))
+                                else if (!(textmesg.includes(sessionStorage.getItem("username"))))
                                 {
                                     let curtdate = new Date();
                                     let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
                                         "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
                                         "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                         "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + data.textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
                                         "</div>" + "</div>";
                                     $("div.direct-chat-messages").append(modifdom);
                                 }
                             }
-                            else if (data.textmesg == "/stop")
+                            else if (textmesg == "/stop")
                             {
-                                document.getElementById("chatboxe").remove();
-                                document.getElementById("headtext").remove();
-                                sessionStorage.removeItem("username");
-                                sessionStorage.removeItem("roomiden");
-                                $("#userstop").modal("show");
+                                sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
+                                document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                             }
                             else
                             {
@@ -363,7 +367,7 @@
                                     "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
                                     "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                    "<div class='direct-chat-text normelem text-justify'>" + data.textmesg + "</div>" + "</div>";
+                                    "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom);
                             }
                         }
@@ -372,6 +376,7 @@
             }
         </script>
         <script src="{{ url_for("static", filename="jscn/bootstrap.bundle.js") }}"></script>
-        <script src="static/jscn/adminlte.js"></script>
+        <script src="{{ url_for("static", filename="jscn/adminlte.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/aes.js") }}"></script>
     </body>
 </html>

@@ -32,7 +32,7 @@ async def chatroom(websocket, path):
     try:
         async for message in websocket:
             data = json.loads(message)
-            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]).upper() + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
+            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
             await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
     finally:
         await unregister(websocket)

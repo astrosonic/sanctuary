@@ -22,6 +22,7 @@
 * Zero logging or data storage to minimize database vulnerabilities
 * Accessible across internet with both IPv4 and IPv6 support by-design
 * No-frills user alias and random-generated keys for chatroom creation
+* Hardened protection using password-based AES message encryption
 * Refresh, close tab, logout, kick users or purge chatroom to cover tracks
 * Transient chatrooms stay valid as long as at least one user is present
 * Complete support for HTML5 formatting tags in conversations
@@ -62,15 +63,15 @@ $ source venv/bin/activate
 ```
 - Install all dependencies for the project.
 ```shell script
-$ pip3 install -r requirements.txt
+(venv) $ pip3 install -r requirements.txt
 ```
 - Run the *Sanctuary Chatroom Server* with the tweakable options shown below.
 ```shell script
-$ python3 servchat.py --version
+(venv) $ python3 servchat.py --version
 Sanctuary Chatroom by AstroSonic, version 22072020
 ```
 ```shell script
-$ python3 servchat.py --help
+(venv) $ python3 servchat.py --help
 Usage: servchat.py [OPTIONS]
 
 Options:
@@ -82,20 +83,20 @@ Options:
   --help               Show this message and exit.
 ```
 ```shell script
-$ python3 servchat.py -s 6969 -c 9696 -4
+(venv) $ python3 servchat.py -s 6969 -c 9696 -4
 ```
 ![](pictures/servpics.png)
-- Open another terminal in the same directory of the cloned repository and activate the virtual environment.
+- Open another terminal in the same directory of the cloned repository and activate the virtual environment there too.
 ```shell script
 $ source venv/bin/activate
 ```
 - As requirements were already met in the previous steps for this virtual environment, simply run the *Sanctuary WebSockets Server* with the tweakable options shown below.
 ```shell script
-$ python3 chatroom.py --version
+(venv) $ python3 chatroom.py --version
 Sanctuary WebSockets by AstroSonic, version 22072020
 ```
 ```shell script
-$ python3 chatroom.py --help
+(venv) $ python3 chatroom.py --help
 Usage: chatroom.py [OPTIONS]
 
 Options:
@@ -106,7 +107,7 @@ Options:
   --help               Show this message and exit.
 ```
 ```shell script
-$ python3 chatroom.py -c 9696 -4
+(venv) $ python3 chatroom.py -c 9696 -4
 ```
 ![](pictures/sockpics.png)
 - Keep in mind that the IP version must be the same for both the chatroom and websockets servers. For instance - If you want your chatroom to function on IPv6 - provide `-6` suffix to both of the servers.
@@ -135,12 +136,15 @@ $ python3 chatroom.py -c 9696 -4
 - Once you are done with the servers, head back to the terminals and press ```[Ctrl+C]``` to stop the servers.
 - When done tinkering, deactivate the virtual environment in both the terminals.
 ```shell script
-$ deactivate
+(venv) $ deactivate
 ```
 - Give stars to the repository if you found it useful.
 
 ## Vulnerabilities
-As most of the functions and routines have been implemented on the client-side to reduce the weight and complexity of the server-side code, the chatroom is currently vulnerable to monkey patching. In such a state, it still can be used for all kinds of conversation but it is highly recommended not to use it for sharing confidential and sensitive information. As long as the chatroom functions in a private network, you should not have to worry about vulnerabilities. But that being said, when you use it - you agree to not hold the contributors responsible for any data loss or breach that may occur due to the use of this chatroom.
+<p align="justify">As most of the functions and routines have been implemented on the client-side to reduce the weight and complexity of the server-side code, the chatroom is vulnerable to monkey patching. Though the risk of information breach has been significantly minimized with the introduction of AES-based hardened protection, still it is highly recommended not to share confidential and sensitive information over the chatrooms. In such a state, it can be used for all kinds of conversation and as long as the chatroom is not opened up to the internet, you should not have to worry about any vulnerabilities.</p>
+
+## Disclaimer
+<p align="justify">When you use Sanctuary - you agree to not hold its contributors responsible for any data loss or breach that may occur due to the use of this chatroom application. You agree that you are aware of the experimental condition of Sanctuary and that you would want to use it at your own risk.</p>
 
 ## Contribute
-You may request for the addition of new features in the [issues](https://github.com/t0xic0der/sanctuary/issues) page but as the project is singlehandedly maintained - it might take time to develop on them. Please consider forking the repository and contributing to its development. :heart:
+<p align="justify">You may request for the addition of new features in the <a href="https://github.com/t0xic0der/sanctuary/issues">issues</a> page but as the project is singlehandedly maintained - it might take time to develop on them. Please consider forking the repository and contributing to its development. :heart:</p>
