@@ -85,7 +85,11 @@ Options:
 $ python3 servchat.py -s 6969 -c 9696 -4
 ```
 ![](pictures/servpics.png)
-- In another terminal, run the *Sanctuary WebSockets Server* with the tweakable options shown below.
+- Open another terminal in the same directory of the cloned repository and activate the virtual environment.
+```shell script
+$ source venv/bin/activate
+```
+- As requirements were already met in the previous steps for this virtual environment, simply run the *Sanctuary WebSockets Server* with the tweakable options shown below.
 ```shell script
 $ python3 chatroom.py --version
 Sanctuary WebSockets by AstroSonic, version 22072020
@@ -129,7 +133,7 @@ $ python3 chatroom.py -c 9696 -4
         - Say goodbye and leave the chatroom by typing in ```/exit``` and pressing ```[ENTER]```. You can of course close your tab or move away to another URL but then you miss your chance of a proper farewell.
         - There are a lot of more ways to handle the group conveniently with just keystrokes!
 - Once you are done with the servers, head back to the terminals and press ```[Ctrl+C]``` to stop the servers.
-- When done tinkering, deactivate the virtual environment.
+- When done tinkering, deactivate the virtual environment in both the terminals.
 ```shell script
 $ deactivate
 ```
