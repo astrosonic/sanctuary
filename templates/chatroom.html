@@ -43,9 +43,33 @@
                 <div class="container">
                     <a class="navbar-brand">
                         <img src="{{ url_for("static", filename="imgs/datalogo.svg") }}" class="brand-image img-circle" style="filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);">
-                        <span class="brand-text headelem">Sanctuary</span>
+                        <span class="brand-text headelem text-olive">Sanctuary</span>
                     </a>
+                    <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#headtext" aria-controls="headtext" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse order-3" id="headtext">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link"><i class="fas fa-id-card text-olive"></i>&nbsp;<span id="userhead" class="normelem">Sanctuary</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"><i class="fas fa-users text-olive"></i>&nbsp;<span id="idenhead" class="normelem">DEADCAFE</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"><i class="fas fa-key text-olive"></i>&nbsp;<span id="passhead" class="normelem">DEADBEEF</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link"><i class="fas fa-clock text-olive"></i>&nbsp;<span id="timehead" class="normelem">FADEDCAF</span></a>
+                            </li>
+                        </ul>
+                    </div>
                     <ul class="order-1 order-md-3 navbar-nav navbar-no-expand ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" onclick="location.reload()">
+                                <i class="fas fa-share-alt"></i>
+                            </a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link" onclick="location.reload()">
                                 <i class="fas fa-sync"></i>
@@ -59,48 +83,7 @@
                 <div class="content">
                     <div class="container">
                         <br/>
-                        <div class="row mb-2" id="headtext">
-                            <div class="col-sm-3">
-                                <p class="normelem" style="margin-bottom: 0px;">Username</p>
-                                <h1 class="m-0 text-dark headelem" id="userhead">Sanctuary</h1>
-                            </div>
-                            <div class="col-sm-3">
-                                <p class="normelem" style="margin-bottom: 0px;">Identity</p>
-                                <h1 class="m-0 text-dark headelem" id="idenhead">DEADCAFE</h1>
-                            </div>
-                            <div class="col-sm-3">
-                                <p class="normelem" style="margin-bottom: 0px;">Password</p>
-                                <h1 class="m-0 text-dark headelem" id="passhead">DEAFBEEF</h1>
-                            </div>
-                            <div class="col-sm-3">
-                                <p class="normelem" style="margin-bottom: 0px;">Time</p>
-                                <h1 class="m-0 text-dark headelem" id="timehead">DEADCAFE</h1>
-                            </div>
-                        </div>
-                        <br/>
-                        <div class="card card-olive direct-chat direct-chat-olive" id="chatboxe">
-                            <div class="card-header">
-                                <h3 class="card-title headelem">Chatroom</h3>
-                                <div class="card-tools">
-                                    <button type="button" class="btn btn-tool" data-toggle="tooltip"><i class="fas fa-door-open"></i></button>
-                                    <button type="button" class="btn btn-tool" data-toggle="tooltip"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            </div>
-                            <div class="card-body" id="mesgarea">
-                                <div class="direct-chat-messages" style="height: 100%;">
-                                </div>
-                            </div>
-                            <div class="card-footer" style="padding-left: 10px; padding-right: 10px;">
-                                <form onsubmit="FetchMessageFromTextbox()" action="javascript:;">
-                                    <div class="input-group">
-                                        <input type="text" name="message" placeholder="Enter your message here" id="textmesg" class="form-control normelem">
-                                        <span class="input-group-append">
-                                            <button type="submit" class="btn bg-olive headelem"><i class="fas fa-share"></i></button>
-                                        </span>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                        <div id="statwarn"></div>
                     </div>
                 </div>
             </div>
@@ -108,9 +91,9 @@
             <footer class="main-footer bg-light">
                 <div class="container">
                     <div class="float-right d-none d-sm-inline normelem">
-                        Created with <i class="fas fa-heart"></i> by <span class="headelem" onclick="window.location.href = 'https://github.com/astrosonic/'">AstroSonic</span>
+                        Created with <i class="fas fa-heart text-olive"></i> by <span class="headelem text-olive" onclick="window.location.href = 'https://github.com/astrosonic/'">AstroSonic</span>
                     </div>
-                    <span class="headelem">Sanctuary v22072020. </span><span onclick="window.location.href = 'https://github.com/astrosonic/sanctuary'" class="normelem">Contribute</span> here.
+                    <span class="headelem text-olive">Sanctuary v25072020. </span><span onclick="window.location.href = 'https://github.com/astrosonic/sanctuary'" class="normelem">Contribute</span> here.
                 </div>
             </footer>
         </div>
@@ -217,7 +200,7 @@
             {
                 let curtdate = new Date();
                 let hour = curtdate.getHours(); let mint = curtdate.getMinutes(); let secs = curtdate.getSeconds();
-                mint = checkTime(mint); secs = checkTime(secs);
+                hour = checkTime(hour); mint = checkTime(mint); secs = checkTime(secs);
                 document.getElementById("timehead").innerHTML = hour + ":" + mint + ":" + secs;
                 let time = setTimeout(startTime, 500);
             }
@@ -256,6 +239,26 @@
                             sessionStorage.setItem("username", username); sessionStorage.setItem("roomiden", roomiden); sessionStorage.setItem("password", password);
                             $('#givename').modal('hide'); document.getElementById("username").value = ""; document.getElementById("roomiden").value = ""; document.getElementById("password").value = "";
                             document.getElementById("userhead").innerText = username; document.getElementById("idenhead").innerText = roomiden; document.getElementById("passhead").innerText = password;
+                            let modifdom = "<div class='card card-outline card-olive'>" + "<div class='card-header'>" + "<p class='card-title headelem text-olive'>Hello " + sessionStorage.getItem("username") + ", Welcome to Sanctuary!</p>" +
+                                "<div class='card-tools'>" + "<button type='button' class='btn btn-tool' data-card-widget='remove'><i class='fas fa-times'></i></button>" +
+                                "</div>" + "</div>" + "<div class='card-body'>" +
+                                "<p class='normelem text-justify'>Sanctuary is a secure synchronous lightweight chatroom with zero logging and total transience.</p>" +
+                                "<p class='normelem text-justify'>You have just joined a chatroom with identity <span class='headelem'>" + sessionStorage.getItem("roomiden") + "</span> using the password <span class='headelem'>" + sessionStorage.getItem("password") + "</span> as username <span class='headelem'>" + sessionStorage.getItem("username") + "</span> at a Sanctuary instance hosted at <span class='headelem'>http://" + document.domain + ":{{ chatport }}/</span>. If you want more people to join in, simply share the username and password with them. That being said, here are some of the cool stuffs you can do.</p>" +
+                                "<ul class='normelem'>" +
+                                "<li>Divert away from boring text-based messaging by using HTML5 for sharing formatted text, images, videos etc.</li>" + "<li>Get rid of people from the chatroom by typing in <code>/kick #USERNAME</code> - Beware someone else can do it to you too</li>" +
+                                "<li>Say your farewells and leave the chatroom by typing in <code>/exit</code> (or simply close the tab but with no goodbyes)</li>" + "<li>Purge the chatroom and kick everyone out of the chatroom by typing <code>/stop</code> - Be very careful while using this</li>" +
+                                "</ul>" + "</div>" + "</div>";
+                            let chatboxe = "<div class='card card-outline card-olive direct-chat direct-chat-olive' id='chatboxe'>" +
+                                "<div class='card-header'>" + "<p class='card-title headelem text-olive'>Chatroom</p>" + "<div class='card-tools'>" +
+                                "<button type='button' class='btn btn-tool' data-toggle='tooltip'><i class='fas fa-door-open'></i></button>" +
+                                "<button type='button' class='btn btn-tool' data-toggle='tooltip'><i class='fas fa-trash-alt'></i></button>" +
+                                "</div>" + "</div>" + "<div class='card-body' id='mesgarea'>" + "<div class='direct-chat-messages' style='height: 100%;'>" +
+                                "</div>" + "</div>" + "<div class='card-footer' style='padding-left: 10px; padding-right: 10px;'>" +
+                                "<form onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div class='input-group'>" +
+                                "<input type='text' name='message' placeholder='Enter your message here' id='textmesg' class='form-control normelem'>" +
+                                "<span class='input-group-append'>" + "<button type='submit' class='btn bg-olive headelem'><i class='fas fa-share'></i></button>" +
+                                "</span>" + "</div>" + "</form>" + "</div>" + "</div>"
+                            $("#statwarn").append(modifdom); $("#statwarn").append(chatboxe);
                         }
                     }
                 }
@@ -276,7 +279,7 @@
                             let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
                             webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                             sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
-                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
+                            document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                         }
                         else if (textmesg == "/exit")
                         {
@@ -284,7 +287,7 @@
                             let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
                             webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                             sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
-                            document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userexit").modal("show");
+                            document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userexit").modal("show");
                         }
                         else if (textmesg.includes("/kick"))
                         {
@@ -292,8 +295,7 @@
                             {
                                 let curtdate = new Date();
                                 let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
-                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
-                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
@@ -302,8 +304,7 @@
                             {
                                 let curtdate = new Date();
                                 let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
-                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
-                                    "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
@@ -315,8 +316,7 @@
                         {
                             let curtdate = new Date();
                             let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
-                                "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" +
-                                "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                 "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                 "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
                             $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
@@ -341,14 +341,13 @@
                                 if (textmesg == "/kick " + sessionStorage.getItem("username"))
                                 {
                                     sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
-                                    document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userkick").modal("show");
+                                    document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userkick").modal("show");
                                 }
                                 else if (!(textmesg.includes(sessionStorage.getItem("username"))))
                                 {
                                     let curtdate = new Date();
                                     let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
-                                        "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
-                                        "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" + "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                         "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                         "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
                                         "</div>" + "</div>";
@@ -358,14 +357,13 @@
                             else if (textmesg == "/stop")
                             {
                                 sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
-                                document.getElementById("chatboxe").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
+                                document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userstop").modal("show");
                             }
                             else
                             {
                                 let curtdate = new Date();
                                 let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
-                                    "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" +
-                                    "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" + "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
                                     "<div class='direct-chat-text normelem text-justify'>" + textmesg + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom);
