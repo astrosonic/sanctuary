@@ -245,9 +245,9 @@
                                 "<p class='normelem text-justify'>Sanctuary is a secure synchronous lightweight chatroom with zero logging and total transience.</p>" +
                                 "<p class='normelem text-justify'>You have just joined a chatroom with identity <span class='headelem'>" + sessionStorage.getItem("roomiden") + "</span> using the password <span class='headelem'>" + sessionStorage.getItem("password") + "</span> as username <span class='headelem'>" + sessionStorage.getItem("username") + "</span> at a Sanctuary instance hosted at <span class='headelem'>http://" + document.domain + ":{{ chatport }}/</span>. If you want more people to join in, simply share the username and password with them. That being said, here are some of the cool stuffs you can do.</p>" +
                                 "<ul class='normelem'>" +
-                                "<li>Divert away from boring text-based messaging by using HTML5 for sharing formatted text, images, videos etc.</li>" + "<li>Get rid of people from the chatroom by typing in <code>/kick #USERNAME</code> - Beware someone else can do it to you too</li>" +
-                                "<li>Say your farewells and leave the chatroom by typing in <code>/exit</code> (or simply close the tab but with no goodbyes)</li>" + "<li>Purge the chatroom and kick everyone out of the chatroom by typing <code>/stop</code> - Be very careful while using this</li>" +
-                                "</ul>" + "</div>" + "</div>";
+                                "<li>Divert away from boring text-based messaging by using HTML5 for sharing formatted text, images, videos etc.</li>" + "<li>Whisper your message to a specific user by typing in <code>/purr USERNAME MESSAGE</code> for a total two-person privacy</li>" +
+                                "<li>Get rid of people from the chatroom by typing in <code>/kick USERNAME</code> - Beware someone else can do it to you too</li>" + "<li>Say your farewells and leave the chatroom by typing in <code>/exit</code> (or simply close the tab but with no goodbyes)</li>" +
+                                "<li>Purge the chatroom and kick everyone out of the chatroom by typing <code>/stop</code> - Be very careful while using this</li>" + "</ul>" + "</div>" + "</div>";
                             let chatboxe = "<div class='card card-outline card-olive direct-chat direct-chat-olive' id='chatboxe'>" +
                                 "<div class='card-header'>" + "<p class='card-title headelem text-olive'>Chatroom</p>" + "<div class='card-tools'>" +
                                 "<button type='button' class='btn btn-tool' data-toggle='tooltip'><i class='fas fa-door-open'></i></button>" +
@@ -289,16 +289,31 @@
                             sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
                             document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userexit").modal("show");
                         }
-                        else if (textmesg.includes("/kick"))
+                        else if (textmesg.split(" ", 2)[0] == "/kick")
                         {
-                            if (textmesg.includes(sessionStorage.getItem("username")))
+                            let recvname = textmesg.split(" ", 2)[1];
+                            if (textmesg.split(" ").length == 2 && recvname.trim() != "")
                             {
-                                let curtdate = new Date();
-                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
-                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
-                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                    "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
-                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                if (textmesg.split(" ", 2)[1] == sessionStorage.getItem("username"))
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + "You cannot kick yourself from the chatroom. Use '/exit' instead.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                }
+                                else
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + "You possibly kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                    let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                                    webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                                }
                             }
                             else
                             {
@@ -306,10 +321,45 @@
                                 let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
                                     "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                     "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                    "<div class='direct-chat-text normelem text-justify'>" + "You kicked a member from the chatroom.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You did not properly use the remove feature.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
                                 $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
-                                let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
-                                webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                            }
+                        }
+                        else if (textmesg.split(" ", 3)[0] == "/purr")
+                        {
+                            var commtext = textmesg.split(" ",3)[0]; var recvname = textmesg.split(" ",3)[1]; var modemesg = textmesg.replace(commtext, ""); modemesg = modemesg.replace(recvname, ""); modemesg = modemesg.trim();
+                            console.log("Command : " + commtext + "\nReceiver name : " + recvname + "\nText message : " + modemesg + "\nTotal message : " + textmesg);
+                            if (textmesg.split(" ", 3).length == 3 && recvname.trim() != "" && modemesg.trim() != "")
+                            {
+                                if (recvname != sessionStorage.getItem("username"))
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + modemesg + "<br/><i>This message was possibly whispered specifically to " + recvname + ".</i>" + "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                    let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
+                                    webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
+                                }
+                                else
+                                {
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + "You cannot whisper messages to yourself.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
+                                }
+                            }
+                            else
+                            {
+                                let curtdate = new Date();
+                                let modifdom = "<div class='direct-chat-msg right'>" + "<div class='direct-chat-infos clearfix'>" +
+                                    "<span class='direct-chat-name float-right headelem'>" + sessionStorage.getItem("username") + "</span>" + "<span class='direct-chat-timestamp float-left normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                    "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                    "<div class='direct-chat-text normelem text-justify'>" + "You did not properly use the whisper feature.<br/><i>This is an automated message which is visible only to you.</i>" + "</div>" + "</div>";
+                                $("div.direct-chat-messages").append(modifdom); document.getElementById("textmesg").value = "";
                             }
                         }
                         else
@@ -347,20 +397,35 @@
                         if (data.username != null && data.textmesg != null)
                         {
                             let textmesg = CryptoJS.AES.decrypt(data.textmesg, sessionStorage.getItem("password")).toString(CryptoJS.enc.Utf8);
-                            if (textmesg.includes("/kick") == true)
+                            if (textmesg.split(" ", 2)[0] == "/kick")
                             {
-                                if (textmesg == "/kick " + sessionStorage.getItem("username"))
+                                if (textmesg.split(" ", 2)[1] == sessionStorage.getItem("username"))
                                 {
                                     sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
                                     document.getElementById("statwarn").remove(); document.getElementById("headtext").remove(); $("#userkick").modal("show");
                                 }
-                                else if (!(textmesg.includes(sessionStorage.getItem("username"))))
+                                else
                                 {
                                     let curtdate = new Date();
                                     let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
                                         "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" + "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
                                         "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
-                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " executed '" + textmesg + "' and removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + "</i>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + data.username + " possibly removed a chatroom member.<br/><i>This is an automated message on the behalf of " + data.username + ".</i>" +
+                                        "</div>" + "</div>";
+                                    $("div.direct-chat-messages").append(modifdom);
+                                }
+                            }
+                            else if (textmesg.split(" ", 3)[0] == "/purr" && textmesg.split(" ", 3).length == 3)
+                            {
+                                var commtext = textmesg.split(" ",3)[0]; var recvname = textmesg.split(" ",3)[1]; var modemesg = textmesg.replace(commtext, ""); modemesg = modemesg.replace(recvname, ""); modemesg = modemesg.trim();
+                                if (recvname == sessionStorage.getItem("username"))
+                                {
+                                    console.log("Command : " + commtext + "\nReceiver name : " + recvname + "\nText message : " + modemesg + "\nTotal message : " + textmesg);
+                                    let curtdate = new Date();
+                                    let modifdom = "<div class='direct-chat-msg'>" + "<div class='direct-chat-infos clearfix'>" +
+                                        "<span class='direct-chat-name float-left headelem'>" + data.username + "</span>" + "<span class='direct-chat-timestamp float-right normelem'>" + curtdate.toLocaleString() + "</span>" + "</div>" +
+                                        "<img class='direct-chat-img' src='{{ url_for("static", filename="imgs/datalogo.svg") }}' style='filter: invert(50%) sepia(47%) saturate(456%) hue-rotate(101deg) brightness(94%) contrast(92%);' alt='Message User Image'>" +
+                                        "<div class='direct-chat-text normelem text-justify'>" + modemesg + "<br/><i>This is a whispered message sent exclusive to you by " + data.username + ".</i>" +
                                         "</div>" + "</div>";
                                     $("div.direct-chat-messages").append(modifdom);
                                 }

@@ -23,6 +23,10 @@
 * Accessible across internet with both IPv4 and IPv6 support by-design
 * No-frills user alias and random-generated keys for chatroom creation
 * Hardened protection using password-based AES message encryption
+* Leave the chatroom (with farewell) using the dedicated `/exit` call
+* Purge the chatroom for every member using the dedicated `/stop` call
+* Kick specific members from chatroom using the dedicated `/kick` call
+* Whisper messages to specific members using the dedicated `/purr` call
 * Refresh, close tab, logout, kick users or purge chatroom to cover tracks
 * Transient chatrooms stay valid as long as at least one user is present
 * Complete support for HTML5 formatting tags in conversations
@@ -129,6 +133,7 @@ Options:
         - You can embed code to your conversation by using ```<code>``` tags.
         - There are a lot of more exciting things you can do with the HTML5 rendering!
     - Get more people on board by sharing the chatroom key. Once you do, you can
+        - Whisper confidential messages to specific users by typing in ```/purr <USERNAME> <MESSAGE>``` and pressing ```[ENTER]```. The message would then be shared only to the expected recipient and not to anyone else.
         - Remove unwanted users by typing in ```/kick <USERNAME>``` and pressing ```[ENTER]```. This capability is shared by everyone so discretion is advised.
         - Purge the entire chatroom by removing all the users and chat records from all ends by typing in ```/stop``` and pressing ```[ENTER]```. Even this capability is shared by everyone so discretion is advised.
         - Say goodbye and leave the chatroom by typing in ```/exit``` and pressing ```[ENTER]```. You can of course close your tab or move away to another URL but then you miss your chance of a proper farewell.
