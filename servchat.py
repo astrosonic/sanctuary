@@ -19,7 +19,7 @@ def chrumnow(netpdata, servport):
 @click.option("-c", "--chatport", "chatport", help="Set the port value for WebSockets [0-65536]", required=True)
 @click.option("-6", "--ipprotv6", "netprotc", flag_value="ipprotv6", help="Start the server on an IPv6 address", required=True)
 @click.option("-4", "--ipprotv4", "netprotc", flag_value="ipprotv4", help="Start the server on an IPv4 address", required=True)
-@click.option("-i", "--server-ip", "servip", flag_value="ip_address", help="Extra IP Address configuration", default=None, required=False)
+@click.option("-i", "--server-ip", "servip", help="Extra IP Address configuration", default=None, required=False)
 @click.version_option(version="22072020", prog_name="Sanctuary Chatroom by AstroSonic")
 def mainfunc(servport, chatport, netprotc, servip):
     global chatp0rt
