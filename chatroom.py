@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 
-import asyncio, json, websockets, sys, click, time
+import asyncio
+import json
+import sys
+import time
 
+import click
+import colorama
+import websockets
+
+colorama.init()
 
 USERS = set()
 
@@ -32,7 +40,8 @@ async def chatroom(websocket, path):
     try:
         async for message in websocket:
             data = json.loads(message)
-            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
+            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(
+                data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
             await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
     finally:
         await unregister(websocket)
@@ -40,7 +49,9 @@ async def chatroom(websocket, path):
 
 def servenow(netpdata="127.0.0.1", chatport="9696"):
     try:
-        print(" > [" + str(time.ctime()) + "] [HOLAUSER] Sanctuary was started up on 'ws://" + str(netpdata) + ":" + str(chatport) + "/'")
+        print(
+            " > [" + str(time.ctime()) + "] [HOLAUSER] Sanctuary was started up on 'ws://" + str(netpdata) + ":" + str(
+                chatport) + "/'")
         start_server = websockets.serve(chatroom, netpdata, int(chatport))
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
@@ -50,19 +61,28 @@ def servenow(netpdata="127.0.0.1", chatport="9696"):
 
 
 @click.command()
+@click.option("-i", "--server-ip", "servip", help="Extra IP Address configuration", default=None, required=False)
 @click.option("-c", "--chatport", "chatport", help="Set the port value for WebSockets [0-65536]", required=True)
-@click.option("-6", "--ipprotv6", "netprotc", flag_value="ipprotv6", help="Start the server on an IPv6 address", required=True)
-@click.option("-4", "--ipprotv4", "netprotc", flag_value="ipprotv4", help="Start the server on an IPv4 address", required=True)
+@click.option("-6", "--ipprotv6", "netprotc", flag_value="ipprotv6", help="Start the server on an IPv6 address",
+              required=True)
+@click.option("-4", "--ipprotv4", "netprotc", flag_value="ipprotv4", help="Start the server on an IPv4 address",
+              required=True)
 @click.version_option(version="22072020", prog_name="Sanctuary WebSockets by AstroSonic")
-def mainfunc(chatport, netprotc):
+def mainfunc(chatport, netprotc, servip):
     print(" > [" + str(time.ctime()) + "] [HOLAUSER] Starting Sanctuary...")
     netpdata = ""
     if netprotc == "ipprotv6":
         print(" > [" + str(time.ctime()) + "] [HOLAUSER] IP version : 6")
-        netpdata = "::"
+        if servip is None:
+            netpdata = "::"
+        else:
+            netpdata = servip
     elif netprotc == "ipprotv4":
         print(" > [" + str(time.ctime()) + "] [HOLAUSER] IP version : 4")
-        netpdata = "0.0.0.0"
+        if servip is None:
+            netpdata = "0.0.0.0"
+        else:
+            netpdata = servip
     servenow(netpdata, chatport)
 
 
