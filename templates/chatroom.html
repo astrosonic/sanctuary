@@ -7,6 +7,7 @@
         <title>Sanctuary</title>
         <link rel="stylesheet" href="{{ url_for("static", filename="css3/fontsome.css") }}" />
         <link rel="stylesheet" href="{{ url_for("static", filename="css3/adminlte.css") }}" />
+        <link rel="stylesheet" href="{{ url_for("static", filename="css3/summernote-lite.min.css") }}" />
         <style>
             @font-face {
                 font-family: "Inter";
@@ -25,6 +26,9 @@
             .headelem {
                 font-family: "Inter", sans-serif;
                 font-weight: 700;
+            }
+            #input-msg-container .note-editor{
+                flex-grow: 1;
             }
             body {
                 -webkit-touch-callout: none;
@@ -194,6 +198,7 @@
 
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
         <script src="{{ url_for("static", filename="jscn/purify.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/summernote-lite.min.js") }}"></script>
 
         <script>
             function sanitizeInput(inputValue){
@@ -263,11 +268,14 @@
                                 "<button type='button' class='btn btn-tool' data-toggle='tooltip'><i class='fas fa-trash-alt'></i></button>" +
                                 "</div>" + "</div>" + "<div class='card-body' id='mesgarea'>" + "<div class='direct-chat-messages' style='height: 100%;'>" +
                                 "</div>" + "</div>" + "<div class='card-footer' style='padding-left: 10px; padding-right: 10px;'>" +
-                                "<form onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div class='input-group'>" +
-                                "<input type='text' name='message' placeholder='Enter your message here' id='textmesg' class='form-control normelem'>" +
+                                "<form onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div id='input-msg-container' class='input-group'>" +
+                                "<textarea name='message' placeholder='Enter your message here' id='textmesg' class='form-control normelem'></textarea>" +
                                 "<span class='input-group-append'>" + "<button type='submit' class='btn bg-olive headelem'><i class='fas fa-share'></i></button>" +
                                 "</span>" + "</div>" + "</form>" + "</div>" + "</div>"
                             $("#statwarn").append(modifdom); $("#statwarn").append(chatboxe);
+                            $('#textmesg').summernote({
+                                focus: true
+                            });
                         }
                     }
                 }
