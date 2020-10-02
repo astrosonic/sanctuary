@@ -1,8 +1,17 @@
 from flask import Flask, render_template
 import click
+import os, sys
+
+#the first configuration allows us to build executables
+if getattr(sys, 'frozen', False):
+    base_dir = os.path.join(sys._MEIPASS)
+    servchat = Flask(__name__,
+        static_folder=os.path.join(base_dir, 'static'),
+        template_folder=os.path.join(base_dir, 'templates'))
+else:
+    servchat = Flask(__name__)
 
 
-servchat = Flask(__name__)
 
 
 @servchat.route("/")
