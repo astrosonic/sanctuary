@@ -27,8 +27,25 @@
                 font-family: "Inter", sans-serif;
                 font-weight: 700;
             }
+            #input-msg-container{
+                display: flex;
+                flex-wrap: nowrap;
+            }
             #input-msg-container .note-editor{
                 flex-grow: 1;
+            }
+            #input-msg-container .note-toolbar, #input-msg-container .note-statusbar{
+                display: none;
+            }
+            .note-editable{
+                padding: 5px 10px !important;
+            }
+            .note-editable p{
+                margin-block-end: 0 !important;
+            }
+            #sendBtn{
+                border-top-left-radius: 0 !important;
+                border-bottom-left-radius: 0 !important;
             }
             body {
                 -webkit-touch-callout: none;
@@ -268,13 +285,27 @@
                                 "<button type='button' class='btn btn-tool' data-toggle='tooltip'><i class='fas fa-trash-alt'></i></button>" +
                                 "</div>" + "</div>" + "<div class='card-body' id='mesgarea'>" + "<div class='direct-chat-messages' style='height: 100%;'>" +
                                 "</div>" + "</div>" + "<div class='card-footer' style='padding-left: 10px; padding-right: 10px;'>" +
-                                "<form onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div id='input-msg-container' class='input-group'>" +
+                                "<form id='messageForm' onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div id='input-msg-container' class='input-group'>" +
                                 "<textarea name='message' placeholder='Enter your message here' id='textmesg' class='form-control normelem'></textarea>" +
-                                "<span class='input-group-append'>" + "<button type='submit' class='btn bg-olive headelem'><i class='fas fa-share'></i></button>" +
+                                "<span>" + "<button id='sendBtn' type='submit' class='btn bg-olive headelem'><i class='fas fa-share'></i></button>" +
                                 "</span>" + "</div>" + "</form>" + "</div>" + "</div>"
                             $("#statwarn").append(modifdom); $("#statwarn").append(chatboxe);
+                            $('#input-msg-container').keypress(function (e) {
+                                if (e.which == 13) {
+                                    $('#messageForm').submit();
+                                    return false;
+                                }
+                            });
                             $('#textmesg').summernote({
-                                focus: true
+                                focus: true,
+                                keyMap: {
+                                    pc: {
+                                        'SHIFT+ENTER': 'insertParagraph',
+                                    },
+                                    mac: {
+                                        'SHIFT+ENTER': 'insertParagraph',
+                                    }
+                                }
                             });
                         }
                     }
