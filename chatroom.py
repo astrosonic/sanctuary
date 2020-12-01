@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 
-import asyncio, json, websockets, sys, click, time
+import asyncio
+import json
+import sys
+import time
 
+import click
+import websockets
 
 USERS = set()
 
 
 def mesej_event(username, roomiden, textmesg):
-    return json.dumps({"username": username, "roomiden": roomiden, "textmesg": textmesg})
+    return json.dumps(
+        {"username": username, "roomiden": roomiden, "textmesg": textmesg}
+    )
 
 
 async def notify_mesej(username, roomiden, textmesg):
@@ -32,7 +39,17 @@ async def chatroom(websocket, path):
     try:
         async for message in websocket:
             data = json.loads(message)
-            print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
+            print(
+                " > ["
+                + str(time.ctime())
+                + "] ["
+                + str(data["roomiden"])
+                + "] User '"
+                + str(data["username"])
+                + "' sends message '"
+                + str(data["textmesg"])
+                + "'"
+            )
             await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
     finally:
         await unregister(websocket)
@@ -40,20 +57,25 @@ async def chatroom(websocket, path):
 
 def servenow(netpdata="127.0.0.1", chatport="9696"):
     try:
-        print(" > [" + str(time.ctime()) + "] [HOLAUSER] Sanctuary was started up on 'ws://" + str(netpdata) + ":" + str(chatport) + "/'")
+        print(
+            " > ["
+            + str(time.ctime())
+            + "] [HOLAUSER] Sanctuary was started up on 'ws://"
+            + str(netpdata)
+            + ":"
+            + str(chatport)
+            + "/'"
+        )
         start_server = websockets.serve(chatroom, netpdata, int(chatport))
         asyncio.get_event_loop().run_until_complete(start_server)
         asyncio.get_event_loop().run_forever()
     except KeyboardInterrupt:
-        print("\n" + " > [" + str(time.ctime()) + "] [SEEUSOON] Sanctuary was shut down")
+        print(
+            "\n" + " > [" + str(time.ctime()) + "] [SEEUSOON] Sanctuary was shut down"
+        )
         sys.exit()
 
 
-@click.command()
-@click.option("-c", "--chatport", "chatport", help="Set the port value for WebSockets [0-65536]", required=True)
-@click.option("-6", "--ipprotv6", "netprotc", flag_value="ipprotv6", help="Start the server on an IPv6 address", required=True)
-@click.option("-4", "--ipprotv4", "netprotc", flag_value="ipprotv4", help="Start the server on an IPv4 address", required=True)
-@click.version_option(version="22072020", prog_name="Sanctuary WebSockets by AstroSonic")
 def mainfunc(chatport, netprotc):
     print(" > [" + str(time.ctime()) + "] [HOLAUSER] Starting Sanctuary...")
     netpdata = ""
