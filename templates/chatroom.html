@@ -193,6 +193,14 @@
         </div>
 
         <script src="{{ url_for("static", filename="jscn/jquery.min.js") }}"></script>
+        <script src="{{ url_for("static", filename="jscn/purify.min.js") }}"></script>
+
+        <script>
+            function sanitizeInput(inputValue){
+                return DOMPurify.sanitize(inputValue, {SAFE_FOR_TEMPLATES: true});
+            }
+        </script>
+
         <script>
             let webesock = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
             sessionStorage.removeItem("username"); sessionStorage.removeItem("password"); sessionStorage.removeItem("roomiden");
@@ -234,6 +242,7 @@
                 {
                     if (!(/\s/.test(username) || /\s/.test(roomiden) || /\s/.test(password)))
                     {
+                        username = sanitizeInput(username);
                         if (roomiden.match(/^[A-F0-9]{8}$/i) && password.match(/^[A-F0-9]{8}$/i))
                         {
                             sessionStorage.setItem("username", username); sessionStorage.setItem("roomiden", roomiden); sessionStorage.setItem("password", password);
@@ -272,6 +281,7 @@
                 else
                 {
                     let textmesg = document.getElementById("textmesg").value;
+                    textmesg = sanitizeInput(textmesg);
                     if (textmesg != "")
                     {
                         if (textmesg == "/stop")
