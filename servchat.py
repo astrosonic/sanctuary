@@ -32,7 +32,3 @@ def mainfunc(servport, chatport, netprotc):
             print(" * IP version  : 4")
             netpdata = "0.0.0.0"
         chrumnow(netpdata, servport)
-
-
-if __name__ == "__main__":
-    mainfunc()

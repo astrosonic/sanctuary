@@ -87,6 +87,3 @@ def mainfunc(chatport, netprotc):
         netpdata = "0.0.0.0"
     servenow(netpdata, chatport)
 
-
-if __name__ == "__main__":
-    mainfunc()
