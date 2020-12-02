@@ -1,7 +1,5 @@
 from multiprocessing import Process
 
-
-
 import click
 import colorama
 
