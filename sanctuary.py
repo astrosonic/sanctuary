@@ -1,6 +1,11 @@
 from multiprocessing import Process
 
+
+
 import click
+import colorama
+
+colorama.init()  # Initialize the console colors on windows
 
 import chatroom
 import servchat
