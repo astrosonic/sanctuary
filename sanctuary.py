@@ -38,7 +38,7 @@ import servchat
     required=True,
 )
 @click.version_option(
-    version="22072020", prog_name="Sanctuary WebSockets by AstroSonic"
+    version="22072020", prog_name="Sanctuary by AstroSonic"
 )
 def main(chatport, netprotc, servport):
     # Additional Thread
