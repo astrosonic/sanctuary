@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import asyncio, json, websockets, sys, click, time
+import asyncio, json, websockets, sys, time
 
 
 USERS = set()
@@ -49,11 +49,6 @@ def servenow(netpdata="127.0.0.1", chatport="9696"):
         sys.exit()
 
 
-@click.command()
-@click.option("-c", "--chatport", "chatport", help="Set the port value for WebSockets [0-65536]", required=True)
-@click.option("-6", "--ipprotv6", "netprotc", flag_value="ipprotv6", help="Start the server on an IPv6 address", required=True)
-@click.option("-4", "--ipprotv4", "netprotc", flag_value="ipprotv4", help="Start the server on an IPv4 address", required=True)
-@click.version_option(version="22072020", prog_name="Sanctuary WebSockets by AstroSonic")
 def mainfunc(chatport, netprotc):
     print(" > [" + str(time.ctime()) + "] [HOLAUSER] Starting Sanctuary...")
     netpdata = ""
@@ -64,7 +59,3 @@ def mainfunc(chatport, netprotc):
         print(" > [" + str(time.ctime()) + "] [HOLAUSER] IP version : 4")
         netpdata = "0.0.0.0"
     servenow(netpdata, chatport)
-
-
-if __name__ == "__main__":
-    mainfunc()
