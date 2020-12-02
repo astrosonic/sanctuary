@@ -1,5 +1,4 @@
 from multiprocessing import Process
-from time import sleep
 
 import click
 
@@ -45,8 +44,6 @@ def main(chatport, netprotc, servport):
     # Additional Thread
     server_thread = Process(target=chatroom.mainfunc, args=(chatport, netprotc))
     server_thread.start()
-
-    sleep(2)  # give server a little time to start
 
     # Main Thread
     servchat.mainfunc(servport, chatport, netprotc)
