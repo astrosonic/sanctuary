@@ -1,5 +1,5 @@
-import click
 from flask import Flask, render_template
+
 
 servchat = Flask(__name__)
 
@@ -18,9 +18,7 @@ def mainfunc(servport, chatport, netprotc):
     chatp0rt = chatport
     print(" * Starting Sanctuary...")
     if servport == chatport:
-        print(
-            " * [FAILMESG] The port values for Chatroom server and WebSocket server cannot be the same!"
-        )
+        print(" * [FAILMESG] The port values for Chatroom server and WebSocket server cannot be the same!")
     else:
         print(" * Chatroom server started on port " + str(servport) + ".")
         print(" * WebSocket server started on port " + str(chatport) + ".")
