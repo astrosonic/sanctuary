@@ -255,7 +255,7 @@
                                 "</div>" + "</div>" + "<div class='card-body' id='mesgarea'>" + "<div class='direct-chat-messages' style='height: 100%;'>" +
                                 "</div>" + "</div>" + "<div class='card-footer' style='padding-left: 10px; padding-right: 10px;'>" +
                                 "<form onsubmit='FetchMessageFromTextbox()' action='javascript:;'>" + "<div class='input-group'>" +
-                                "<input type='text' name='message' placeholder='Enter your message here' id='textmesg' class='form-control normelem'>" +
+                                "<input type='text' name='message' autocomplete='off' placeholder='Enter your message here' id='textmesg' class='form-control normelem'>" +
                                 "<span class='input-group-append'>" + "<button type='submit' class='btn bg-olive headelem'><i class='fas fa-share'></i></button>" +
                                 "</span>" + "</div>" + "</form>" + "</div>" + "</div>"
                             $("#statwarn").append(modifdom); $("#statwarn").append(chatboxe);
@@ -272,7 +272,7 @@
                 else
                 {
                     let textmesg = document.getElementById("textmesg").value;
-                    if (textmesg != "")
+                    if (textmesg.trim().length != 0)
                     {
                         if (textmesg == "/stop")
                         {
@@ -372,6 +372,10 @@
                             let encrmesg = CryptoJS.AES.encrypt(textmesg, sessionStorage.getItem("password")).toString();
                             webesock.send(JSON.stringify({username:sessionStorage.getItem("username"), roomiden:sessionStorage.getItem("roomiden"), textmesg:encrmesg}));
                         }
+                    }
+                    else
+                    {
+                        document.getElementById('textmesg').value = ""
                     }
                 }
             }
