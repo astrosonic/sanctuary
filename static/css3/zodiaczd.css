@@ -1,0 +1,186 @@
+/* Inter - Declaration */
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: normal;
+    src: url("../font/sans/intr-rlar.woff") format("woff");
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: normal;
+    src: url("../font/sans/intr-ital.woff") format("woff");
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: bold;
+    src: url("../font/sans/intr-bold.woff") format("woff");
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: italic;
+    font-weight: bold;
+    src: url("../font/sans/intr-bdit.woff") format("woff");
+}
+
+/* JetBrains Mono - Declaration */
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: normal;
+    src: url("../font/mono/jtbn-rlar.ttf");
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: italic;
+    font-weight: normal;
+    src: url("../font/mono/jtbn-ital.ttf");
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: bold;
+    src: url("../font/mono/jtbn-bold.ttf");
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: italic;
+    font-weight: bold;
+    src: url("../font/mono/jtbn-bdit.ttf");
+}
+
+/* Barlow Condensed - Declaration */
+
+@font-face {
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: normal;
+    src: url("../font/cond/brcn-rlar.ttf");
+}
+
+@font-face {
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: normal;
+    src: url("../font/cond/brcn-ital.ttf");
+}
+
+@font-face {
+    font-family: 'Barlow Condensed';
+    font-style: normal;
+    font-weight: bold;
+    src: url("../font/cond/brcn-bold.ttf");
+}
+
+@font-face {
+    font-family: 'Barlow Condensed';
+    font-style: italic;
+    font-weight: bold;
+    src: url("../font/cond/brcn-bdit.ttf");
+}
+
+/* Inter - Classification */
+
+.intr-rlar {
+    font-family: 'Inter', sans-serif !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+}
+
+.intr-ital {
+    font-family: 'Inter', sans-serif !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+}
+
+.intr-bold {
+    font-family: 'Inter', sans-serif !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+}
+
+.intr-bdit {
+    font-family: 'Inter', sans-serif !important;
+    font-style: italic !important;
+    font-weight: bold !important;
+}
+
+/* JetBrain Mono - Classification */
+
+.jtbn-rlar {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+}
+
+.jtbn-ital {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+}
+
+.jtbn-bold {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+}
+
+.jtbn-bdit {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-style: italic !important;
+    font-weight: bold !important;
+}
+
+/* Barlow Condensed - Classification */
+
+.brcn-rlar {
+    font-family: 'Barlow Condensed', sans-serif !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+}
+
+.brcn-ital {
+    font-family: 'Barlow Condensed', sans-serif !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+}
+
+.brcn-bold {
+    font-family: 'Barlow Condensed', sans-serif !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+}
+
+.brcn-bdit {
+    font-family: 'Barlow Condensed', sans-serif !important;
+    font-style: italic !important;
+    font-weight: bold !important;
+}
+
+/* Remaining Styles */
+
+.tabe-body-styl {
+    margin-left: 0.75% !important;
+    margin-right: 0.75% !important;
+    width: 98.5% !important;
+    height: 87.5% !important;
+    background-color: #f6f8fa !important;
+    overflow-y: auto !important;
+}
+
+.tabe-head-back {
+    background-color: #f6f8fa !important;
+}
+
+.head-text-colr {
+    color: #00c080 !important;
+}

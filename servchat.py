@@ -4,12 +4,18 @@ from flask import Flask, render_template
 servchat = Flask(__name__)
 
 
-@servchat.route("/")
+@servchat.route("/chatroom/")
 def chatroom():
     return render_template("chatroom.html", chatport=chatp0rt)
 
 
+@servchat.route("/")
+def zodiaczd():
+    return render_template("zodiaczd.html", chatport=chatp0rt)
+
+
 def chrumnow(netpdata, servport):
+    servchat.config["TEMPLATES_AUTO_RELOAD"] = True
     servchat.run(host=netpdata, port=servport)
 
 
