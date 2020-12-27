@@ -119,6 +119,7 @@ async def new_username_presence_check_and_identification(sockobjc, mesgdict):
                     await indxobjc.send(json.dumps(nwusrnot));
 
 
+'''
 async def chatroom(sockobjc, path):
     try:
         if sockobjc not in USERLIST.keys():
@@ -130,21 +131,19 @@ async def chatroom(sockobjc, path):
                     await new_username_presence_check_and_identification(sockobjc, mesgdict)
     finally:
         await old_username_userlist_and_roomlist_removal(sockobjc)
-
-
 '''
+
 async def chatroom(websocket, path):
     await register(websocket)
     try:
         async for message in websocket:
             data = json.loads(message)
-            if data["operands"] ==
             print(data)
+            await websocket.send("Hello");
             #print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
             #await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
     finally:
         await unregister(websocket)
-'''
 
 
 def servenow(netpdata="127.0.0.1", chatport="9696"):

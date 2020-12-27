@@ -24,13 +24,15 @@ class SocketConnection {
 
     async keep_listening_to_the_server () {
         this.sockobjc.onmessage = function (event) {
-            let dataobjc = JSON.parse(event.data);
-            console.log(dataobjc);
+            /*let dataobjc = JSON.parse(event.data);*/
+            console.log(event.data);
+            /*
             if (dataobjc["operands"] === "CHEKFAIL") {
                 $("#dupluser").modal("setting", "closable", false).modal("show");
             } else if (dataobjc["operands"] === "CHEKFAIL") {
                 $("#userttle").text(dataobjc["userinfo"]["username"]);
             }
+            */
         }
     }
 }
