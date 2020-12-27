@@ -50,7 +50,7 @@ import servchat
     default=None
 )
 @click.version_option(
-    version="22072020", prog_name="Sanctuary by AstroSonic"
+    version="27122020", prog_name="Sanctuary by AstroSonic"
 )
 def main(chatport, netprotc, servport, ip_address):
     if ip_address == "auto" and netprotc == "ipprotv4":
