@@ -10,8 +10,8 @@ def chatroom():
 
 
 @servchat.route("/")
-def zodiaczd():
-    return render_template("zodiaczd.html", chatport=chatp0rt)
+def chatmain():
+    return render_template("chatmain.html", chatport=chatp0rt)
 
 
 def chrumnow(netpdata, servport):

@@ -41,11 +41,17 @@ ROOMLIST = {
 def mesej_event(username, roomiden, textmesg):
     return json.dumps({"username": username, "roomiden": roomiden, "textmesg": textmesg})
 
-
+'''
 async def notify_mesej(username, roomiden, textmesg):
     if USERS:
         message = mesej_event(username, roomiden, textmesg)
         await asyncio.wait([user.send(message) for user in USERS])
+'''
+
+
+async def notify_mesej(sockobjc, mesgtext):
+    if USERS:
+        await sockobjc.send(mesgtext)
 
 
 async def register(websocket):
@@ -67,7 +73,7 @@ def check_websocket_object_presence(sockobjc):
 
 
 async def old_username_userlist_and_roomlist_removal(sockobjc):
-    if sockobjc in USERLIST:
+    if sockobjc in USERLIST.keys():
         leftname = USERLIST[sockobjc]["username"]
         USERLIST.pop(sockobjc)
         print(leftname + " left the Dispatch instance")
@@ -88,63 +94,56 @@ async def old_username_userlist_and_roomlist_removal(sockobjc):
                 "leftname": leftname,
             }
             await sockette.send(json.dumps(servltmg))
+    elif sockobjc in WAITAREA:
+        print("An unidentified user left.")
+        WAITAREA.remove(sockobjc)
 
 
 async def new_username_presence_check_and_identification(sockobjc, mesgdict):
+    flagavbl = False
     for indx in USERLIST.keys():
-        if USERLIST[indx]["username"] == mesgdict["userinfo"]["username"]:
+        if USERLIST[indx]["username"] == mesgdict["username"]:
+            print(mesgdict["username"] + " could not connect due to uniqueness failure.")
             psntmesg = {
                 "operands": "CHEKFAIL",
-                "userinfo": mesgdict["userinfo"]
+                "userinfo": mesgdict["username"]
             }
             await sockobjc.send(json.dumps(psntmesg))
             await sockobjc.close()
             WAITAREA.remove(sockobjc)
-        else:
-            USERLIST[sockobjc] = mesgdict["userinfo"]
-            psntmesg = {
-                "operands": "CHEKPASS",
-                "userinfo": mesgdict["userinfo"],
-                "userlist": USERLIST,
-                "roomlist": ROOMLIST,
-            }
-            await sockobjc.send(json.dumps(psntmesg))
-            nwusrnot = {
-                "operands": "WLCMUSER",
-                "username": mesgdict["userinfo"]["username"],
-                "userlist": USERLIST
-            }
-            for indxobjc in USERLIST.keys():
-                if indxobjc != sockobjc:
-                    await indxobjc.send(json.dumps(nwusrnot));
+            flagavbl = True
+    if not flagavbl:
+        print(mesgdict["username"] + " was successfully connected.")
+        USERLIST[sockobjc] = {
+            "username": mesgdict["username"],
+            "jointime": mesgdict["jointime"],
+        }
+        psntmesg = {
+            "operands": "CHEKPASS",
+            "userinfo": mesgdict["username"]
+        }
+        await sockobjc.send(json.dumps(psntmesg))
+        nwusrnot = {
+            "operands": "WLCMUSER",
+            "username": mesgdict["username"]
+        }
+        for indxobjc in USERLIST.keys():
+            if indxobjc != sockobjc:
+                await indxobjc.send(json.dumps(nwusrnot))
 
 
 async def chatroom(sockobjc, path):
     try:
         if sockobjc not in USERLIST.keys():
             WAITAREA.append(sockobjc)
-        elif sockobjc in WAITAREA:
+        if sockobjc in WAITAREA:
             async for mesgjson in sockobjc:
                 mesgdict = json.loads(mesgjson)
                 if mesgdict["operands"] == "IDENTIFY":
+                    print(mesgdict)
                     await new_username_presence_check_and_identification(sockobjc, mesgdict)
     finally:
         await old_username_userlist_and_roomlist_removal(sockobjc)
-
-
-'''
-async def chatroom(websocket, path):
-    await register(websocket)
-    try:
-        async for message in websocket:
-            data = json.loads(message)
-            if data["operands"] ==
-            print(data)
-            #print(" > [" + str(time.ctime()) + "] [" + str(data["roomiden"]) + "] User '" + str(data["username"]) + "' sends message '" + str(data["textmesg"]) + "'")
-            #await notify_mesej(data["username"], data["roomiden"], data["textmesg"])
-    finally:
-        await unregister(websocket)
-'''
 
 
 def servenow(netpdata="127.0.0.1", chatport="9696"):
