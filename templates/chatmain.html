@@ -8,28 +8,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{{ url_for("static", filename="css3/zodiaczd.css") }}" />
-        <script src="{{ url_for('static', filename='jscn/zodiaczd.js') }}"></script>
         <title>Sanctuary</title>
+        <script src="{{ url_for('static', filename='jscn/zodiaczd.js') }}"></script>
     </head>
     <body onload="loadexec();">
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.2.6/purify.min.js" integrity="sha512-rXAHWSMciPq2KsOxTvUeYNBb45apbcEXUVSIexVPOBnKfD/xo99uUe5M2OOsC49hGdUrkRLYsATkQQHMzUo/ew==" crossorigin="anonymous"></script>
-        <script>
-            let sockobjc = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
-            sockobjc.onmessage = function (event) {
-                let respdict = JSON.parse(event.data);
-                if (respdict["operands"] === "CHEKFAIL") {
-                    let joinfail = new bootstrap.Modal(
-                        document.getElementById("joinfail"), {
-                            keyboard: false,
-                            backdrop: "static"
-                        }
-                    );
-                    joinfail.show();
-                }
-            }
-        </script>
         <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-success" style="padding: 0%;">
             <div class="container">
                 <a class="navbar-brand brcn-bold" href="#">SANCTUARY</a>
@@ -37,8 +22,12 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarText">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-                    <span class="navbar-text intr-rlar" id="headuser">Disconnected</span>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active intr-rlar" aria-current="page" id="headuser">Disconnected</a>
+                        </li>
+                    </ul>
+                    <span class="navbar-text intr-rlar jtbn-rlar" id="timehead">00:00:00</span>
                 </div>
             </div>
         </nav>
@@ -72,7 +61,7 @@
                     <input type="text" class="form-control jtbn-rlar" id="username" placeholder="Enter your username">
                 </div>
                 <div class="modal-footer" style="padding: 1%; background-color: #198754;">
-                    <button type="button" class="btn btn-sm btn-light intr-bold" data-bs-dismiss="modal" onclick="attempt_identification_to_dispatch_service();">Begin</button>
+                    <button type="button" class="btn btn-sm btn-light intr-bold" onclick="attempt_identification_to_dispatch_service();">Begin</button>
                 </div>
             </div>
         </div>
@@ -84,16 +73,61 @@
                     <h5 class="modal-title brcn-bold" id="staticBackdropLabel" style="color: #ffffff;">CONNECTION DECLINED</h5>
                 </div>
                 <div class="modal-body" style="padding: 2%;">
-                    <p class="intr-rlar small" style="text-align: justify;">
+                    <p class="intr-rlar small" style="text-align: justify; margin: 0px;">
                         A participant with the same username already exists in the server due to which your connection
                         was declined from the Dispatch service. Please refresh the page and try using a different
                         username or attempt connecting with a different Dispatch service.
                     </p>
                 </div>
                 <div class="modal-footer" style="padding: 1%; background-color: #198754;">
-                    <button type="button" class="btn btn-sm btn-light intr-bold" data-bs-dismiss="modal" onclick="location.reload();">Reload</button>
+                    <button type="button" class="btn btn-sm btn-light intr-bold" onclick="location.reload();">Reload</button>
                 </div>
             </div>
         </div>
     </div>
+    <div class="modal fade" id="sockfail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="padding: 2%; background-color: #198754;">
+                    <h5 class="modal-title brcn-bold" id="staticBackdropLabel" style="color: #ffffff;">CONNECTION FAILED</h5>
+                </div>
+                <div class="modal-body" style="padding: 2%;">
+                    <p class="intr-rlar small" style="text-align: justify; margin: 0px;">
+                        Connection to the Dispatch service could not be maintained and you were removed from the
+                        chatroom you were connected to. Please refresh the page and attempt connecting to the service
+                        again.
+                    </p>
+                </div>
+                <div class="modal-footer" style="padding: 1%; background-color: #198754;">
+                    <button type="button" class="btn btn-sm btn-light intr-bold" onclick="location.reload();">Reload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-absolute top-0 start-50 translate-middle-x" style="z-index: 2000; margin-top: 1%;">
+        <div class="toast d-flex align-items-center" role="alert" aria-live="assertive" aria-atomic="true" id="invluser">
+            <div class="toast-body intr-rlar">Invalid username entered</div>
+        </div>
+    </div>
+    <div class="toast-container position-absolute top-0 start-50 translate-middle-x" style="z-index: 2000; margin-top: 1%;">
+        <div class="toast d-flex align-items-center" role="alert" aria-live="assertive" aria-atomic="true" id="convfail">
+            <div class="toast-body intr-rlar">Message conveyance failed</div>
+        </div>
+    </div>
+    <script>
+        let dataload = new bootstrap.Modal(document.getElementById("dataload"), {keyboard: false, backdrop: "static"});
+        let sockfail = new bootstrap.Modal(document.getElementById("sockfail"), {keyboard: false, backdrop: "static"});
+        let joinfail = new bootstrap.Modal(document.getElementById("joinfail"), {keyboard: false, backdrop: "static"});
+        let invluser = new bootstrap.Toast(document.getElementById("invluser"), {animation: true});
+        let convfail = new bootstrap.Toast(document.getElementById("convfail"), {animation: true});
+    </script>
+    <script>
+        let sockobjc = new WebSocket("ws://" + document.domain + ":" + {{ chatport }} + "/");
+        sockobjc.onmessage = function (event) {
+            let respdict = JSON.parse(event.data);
+            if (respdict["operands"] === "CHEKFAIL") {
+                joinfail.show();
+            }
+        }
+    </script>
 </html>

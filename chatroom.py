@@ -117,6 +117,7 @@ async def new_username_presence_check_and_identification(sockobjc, mesgdict):
         USERLIST[sockobjc] = {
             "username": mesgdict["username"],
             "jointime": mesgdict["jointime"],
+            "chatroom": "--------",
         }
         psntmesg = {
             "operands": "CHEKPASS",

@@ -13,29 +13,6 @@ function timeqant () {
     let time = setTimeout(timeqant, 500);
 }
 
-function SwitchTabActiveState (head) {
-    let sectlist = {
-        "wlcm-ttle": "wlcm-body",
-        "chrm-ttle": "chrm-body",
-        "user-ttle": "user-body",
-        "make-ttle": "make-body",
-    };
-    for (indx in sectlist) {
-        if (indx !== head) {
-            $("#" + indx).removeClass("active");
-            $("#" + sectlist[indx]).removeClass("active");
-        }
-    }
-    $("#" + head).addClass("active");
-    $("#" + sectlist[head]).addClass("active");
-}
-
-function OnLoadExecutables () {
-    timeqant();
-    sessionStorage.clear();
-    $("#restwarn").modal("setting", "closable", false).modal("show");
-}
-
 async function RegisterPersonOnDispatch () {
     let dspchuri = $("#dspchuri").val()
     let username = $("#usertext").val();
@@ -48,15 +25,23 @@ async function RegisterPersonOnDispatch () {
 
 async function attempt_identification_to_dispatch_service () {
     let username = document.getElementById("username").value;
-    sessionStorage.setItem("username", username);
-    let timestmp = new Date;
-    let idencode = JSON.stringify({
-        "username": username,
-        "jointime": timestmp.toString(),
-        "operands": "IDENTIFY"
-    });
-    await sockobjc.send(idencode);
-    document.getElementById("headuser").innerText = username;
+    let cleantxt = DOMPurify.sanitize(username, {USE_PROFILES: {html: false}}).trim();
+    if (cleantxt.match(/^[A-Z0-9]{1,15}$/i)) {
+        sessionStorage.setItem("username", cleantxt);
+        sessionStorage.setItem("chatroom", "--------");
+        let timestmp = new Date;
+        let idencode = JSON.stringify({
+            "username": cleantxt,
+            "jointime": timestmp.toString(),
+            "operands": "IDENTIFY"
+        });
+        await sockobjc.send(idencode);
+        document.getElementById("headuser").innerText = cleantxt;
+        dataload.hide();
+    } else {
+        console.log("Invalid username entered");
+        invluser.show();
+    }
 }
 
 function randgene() {
@@ -69,100 +54,129 @@ function randgene() {
 }
 
 function loadexec () {
-    let dataload = new bootstrap.Modal(
-        document.getElementById(
-            "dataload"), {
-                keyboard: false,
-                backdrop: "static"
-        }
-    );
+    timeqant();
     dataload.show();
     sessionStorage.clear();
     sessionStorage.setItem("greplyto", "--------");
+    document.getElementById("mesgtext").value = "";
 }
 
 function sendmesg() {
-    let mesgtext = document.getElementById("mesgtext").value;
-    let cleantxt = DOMPurify.sanitize(mesgtext, {USE_PROFILES: {html: false}}).trim();
-    if (cleantxt !== "") {
-        if (cleantxt === "/help") {
-            let mesgiden = randgene();
-            let curtdate = new Date;
-            let localstr = curtdate.toLocaleTimeString();
-            $("#mesglist").append(
-                `
-                <a class="list-group-item list-group-item-action" id="${mesgiden}" onclick="greplyto('${mesgiden}')">
-                    <div style="margin-bottom: 1%;">
-                        <span class="float-none">
-                            <strong class="jtbn-bold">SANCTUARY</strong>
-                        </span>
-                        <span class="float-end">
-                            <code class="jtbn-rlar">${localstr}</code>&nbsp;
-                            <div class="badge jtbn-rlar pill-bord">${mesgiden}</div>
-                        </span>
-                    </div>
-                    <p class="jtbn-rlar small" style="margin: 0%;">
-                        <dl class="row small">
-                            <dt class="col-sm-5 jtbn-bold">/join [chatroom] [password]</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Join an existing chatroom with their name and password</dd>
-                            <dt class="col-sm-5 jtbn-bold">/make [chatroom] [password]</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Create a new chatroom and set its password</dd>
-                            <dt class="col-sm-5 jtbn-bold">/exit</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Leave the chatroom you are in now</dd>
-                            <dt class="col-sm-5 jtbn-bold">/lsus</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Show the list of users in your current chatroom</dd>
-                            <dt class="col-sm-5 jtbn-bold">/lsal</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Show the list of users connected to the Dispatch instance</dd>
-                            <dt class="col-sm-5 jtbn-bold">/lsrm</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Show the list of chatrooms active in the Dispatch instance</dd>
-                            <dt class="col-sm-5 jtbn-bold">/save</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Save your current connection profile to a file</dd>
-                            <dt class="col-sm-5 jtbn-bold">/wipe</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Clear the screen buffer of all the messages</dd>
-                            <dt class="col-sm-5 jtbn-bold">/ownr</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Fetch the owner name of your current chatroom</dd>
-                            <dt class="col-sm-5 jtbn-bold">/stop</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Shut down the chatroom and remove all users</dd>
-                            <dt class="col-sm-5 jtbn-bold">/purr [username] [mesgtext]</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Whisper messages to a specific user in the chatroom</dd>
-                            <dt class="col-sm-5 jtbn-bold">/anon [username] [mesgtext]</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Anonymously dispatch messages to a specific user</dd>
-                            <dt class="col-sm-5 jtbn-bold">/cont</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Know more about the folks we are thankful to</dd>
-                            <dt class="col-sm-5 jtbn-bold">/help</dt>
-                            <dd class="col-sm-7 jtbn-rlar">Show help and support topics</dd>
-                        </dl>
-                    </p>
-                </a>
-                `
-            );
-            document.getElementById("mesgtext").value = "";
+    if (sockobjc.readyState === 3) {
+        sockfail.show();
+    } else {
+        let mesgtext = document.getElementById("mesgtext").value;
+        let cleantxt = DOMPurify.sanitize(mesgtext, {USE_PROFILES: {html: false}}).trim();
+        let mesgiden = randgene();
+        let curtdate = new Date;
+        let localstr = curtdate.toLocaleTimeString();
+        if (cleantxt !== "") {
+            if (cleantxt === "/help") {
+                let srceuser = "SANCTUARY";
+                $("#mesglist").append(
+                    `
+                    <a class="list-group-item list-group-item-action" id="${mesgiden}" onclick="greplyto('${mesgiden}')">
+                        <div style="margin-bottom: 1%;">
+                            <span class="float-none">
+                                <strong class="jtbn-bold">${srceuser}</strong>
+                            </span>
+                            <span class="float-end">
+                                <code class="jtbn-rlar">${localstr}</code>&nbsp;
+                                <div class="badge jtbn-rlar pill-bord">${mesgiden}</div>
+                            </span>
+                        </div>
+                        <p class="jtbn-rlar small" style="margin: 0%;">
+                            <dl class="row small">
+                                <dt class="col-sm-5 jtbn-bold">/join [chatroom] [password]</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Join an existing chatroom with their name and password</dd>
+                                <dt class="col-sm-5 jtbn-bold">/make [chatroom] [password]</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Create a new chatroom and set its password</dd>
+                                <dt class="col-sm-5 jtbn-bold">/exit</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Leave the chatroom you are in now</dd>
+                                <dt class="col-sm-5 jtbn-bold">/lsus</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Show the list of users in your current chatroom</dd>
+                                <dt class="col-sm-5 jtbn-bold">/lsal</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Show the list of users connected to the Dispatch instance</dd>
+                                <dt class="col-sm-5 jtbn-bold">/lsrm</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Show the list of chatrooms active in the Dispatch instance</dd>
+                                <dt class="col-sm-5 jtbn-bold">/save</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Save your current connection profile to a file</dd>
+                                <dt class="col-sm-5 jtbn-bold">/wipe</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Clear the screen buffer of all the messages</dd>
+                                <dt class="col-sm-5 jtbn-bold">/ownr</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Fetch the owner name of your current chatroom</dd>
+                                <dt class="col-sm-5 jtbn-bold">/stop</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Shut down the chatroom and remove all users</dd>
+                                <dt class="col-sm-5 jtbn-bold">/purr [username] [mesgtext]</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Whisper messages to a specific user in the chatroom</dd>
+                                <dt class="col-sm-5 jtbn-bold">/anon [username] [mesgtext]</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Anonymously dispatch messages to a specific user</dd>
+                                <dt class="col-sm-5 jtbn-bold">/cont</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Know more about the folks we are thankful to</dd>
+                                <dt class="col-sm-5 jtbn-bold">/help</dt>
+                                <dd class="col-sm-7 jtbn-rlar">Show help and support topics</dd>
+                            </dl>
+                        </p>
+                    </a>
+                    `
+                );
+                document.getElementById("mesgtext").value = "";
+            } else {
+                if (sessionStorage.getItem("chatroom") === "--------") {
+                    let srceuser = "SANCTUARY";
+                    $("#mesglist").append(
+                        `
+                        <a class="list-group-item list-group-item-action" id="${mesgiden}" onclick="greplyto('${mesgiden}')">
+                            <div style="margin-bottom: 1%;">
+                                <span class="float-none">
+                                    <strong class="jtbn-bold">${srceuser}</strong>
+                                </span>
+                                <span class="float-end">
+                                    <code class="jtbn-rlar">${localstr}</code>&nbsp;
+                                    <div class="badge jtbn-rlar pill-bord">${mesgiden}</div>
+                                </span>
+                            </div>
+                            <p class="jtbn-rlar small" style="margin: 0%;">
+                                You have not yet joined in any chatroom.
+                            </p>
+                        </a>
+                        `
+                    );
+                    convfail.show();
+                    document.getElementById("mesgtext").value = "";
+                } else {
+                    let srceuser = sessionStorage.getItem("username");
+                    let sencode = JSON.stringify({
+                        "operands": "CONVEYMG",
+                        "mesgtext": cleantxt,
+                        "localstr": curtdate.toString(),
+                        "chatroom": sessionStorage.getItem("chatroom"),
+                        "srceuser": srceuser
+                    });
+                    sockobjc.send(cleantxt);
+                    $("#mesglist").append(
+                        `
+                        <a class="list-group-item list-group-item-action" id="${mesgiden}" onclick="greplyto('${mesgiden}')">
+                            <div style="margin-bottom: 1%;">
+                                <span class="float-none">
+                                    <strong class="jtbn-bold">${srceuser}</strong>
+                                </span>
+                                <span class="float-end">
+                                    <code class="jtbn-rlar">${localstr}</code>&nbsp;
+                                    <div class="badge jtbn-rlar pill-bord">${mesgiden}</div>
+                                </span>
+                            </div>
+                            <p class="jtbn-rlar small" style="margin: 0%;">${cleantxt}</p>
+                        </a>
+                        `
+                    );
+                    document.getElementById("mesgtext").value = "";
+                }
+            }
         } else {
-            let mesgiden = randgene();
-            let curtdate = new Date;
-            let localstr = curtdate.toLocaleTimeString();
-            //sockobjc.send(cleantxt);
-            $("#mesglist").append(
-                `
-                <a class="list-group-item list-group-item-action" id="${mesgiden}" onclick="greplyto('${mesgiden}')">
-                    <div style="margin-bottom: 1%;">
-                        <span class="float-none">
-                            <strong class="jtbn-bold">t0xic0der</strong>
-                        </span>
-                        <span class="float-end">
-                            <code class="jtbn-rlar">${localstr}</code>&nbsp;
-                            <div class="badge jtbn-rlar pill-bord">${mesgiden}</div>
-                        </span>
-                    </div>
-                    <p class="jtbn-rlar small" style="margin: 0%;">${cleantxt}</p>
-                </a>
-                `
-            );
+            console.log("Empty messages are not allowed");
             document.getElementById("mesgtext").value = "";
         }
-    } else {
-        console.log("Empty messages are not allowed");
-        document.getElementById("mesgtext").value = "";
     }
 }
 
