@@ -4,6 +4,16 @@ from flask import Flask, render_template
 servchat = Flask(__name__)
 
 
+@servchat.route("/testmain/")
+def testmain():
+    return render_template("testmain.html", chatport=chatp0rt)
+
+
+@servchat.route("/test/")
+def test():
+    return render_template("test.html", chatport=chatp0rt)
+
+
 @servchat.route("/chatroom/")
 def chatroom():
     return render_template("chatroom.html", chatport=chatp0rt)

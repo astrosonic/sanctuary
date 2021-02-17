@@ -127,6 +127,8 @@
             let respdict = JSON.parse(event.data);
             if (respdict["operands"] === "CHEKFAIL") {
                 joinfail.show();
+            } else if (respdict["operands"] === "ROOMMADE") {
+                console.log("Room has been created");
             }
         }
     </script>

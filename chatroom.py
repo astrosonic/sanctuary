@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import asyncio, json, websockets, sys, time
+from hashlib import sha256
 
 
 USERS = set()
@@ -40,6 +41,7 @@ ROOMLIST = {
 
 def mesej_event(username, roomiden, textmesg):
     return json.dumps({"username": username, "roomiden": roomiden, "textmesg": textmesg})
+
 
 '''
 async def notify_mesej(username, roomiden, textmesg):
@@ -95,7 +97,7 @@ async def old_username_userlist_and_roomlist_removal(sockobjc):
             }
             await sockette.send(json.dumps(servltmg))
     elif sockobjc in WAITAREA:
-        print("An unidentified user left.")
+        #print("An unidentified user left.")
         WAITAREA.remove(sockobjc)
 
 
@@ -133,6 +135,59 @@ async def new_username_presence_check_and_identification(sockobjc, mesgdict):
                 await indxobjc.send(json.dumps(nwusrnot))
 
 
+def check_chatroom_name_legality(roomname):
+    if len(roomname) != 8:
+        return False
+    else:
+        try:
+            geee = int(roomname, 16)
+            return roomname.isupper()
+        except ValueError:
+            return False
+
+
+async def create_new_chatroom(sockobjc, mesgdict):
+    if check_chatroom_name_legality(mesgdict["roomname"]):
+        if check_chatroom_name_legality(mesgdict["password"]):
+            if mesgdict["roomname"] not in ROOMLIST.keys():
+                ROOMLIST[mesgdict["roomname"]] = {
+                    "ownrname": mesgdict["username"],
+                    "maketime": time.ctime(),
+                    "passhash": sha256(mesgdict["password"].encode("utf-8")).hexdigest()
+                }
+                makeresp = {
+                    "operands": "ROOMMADE",
+                    "roomname": mesgdict["roomname"],
+                    "ownrname": mesgdict["username"]
+                }
+                for indxobjc in USERLIST.keys():
+                    await indxobjc.send(json.dumps(makeresp))
+            else:
+                makefail = {
+                    "operands": "ROOMFAIL",
+                    "reasonff": "UNIQFAIL",
+                    "roomname": mesgdict["roomname"],
+                    "ownrname": mesgdict["username"]
+                }
+                await sockobjc.send(json.dumps(makefail))
+        else:
+            makefail = {
+                "operands": "ROOMFAIL",
+                "reasonff": "INVLPASS",
+                "roomname": mesgdict["roomname"],
+                "ownrname": mesgdict["username"]
+            }
+            await sockobjc.send(json.dumps(makefail))
+    else:
+        makefail = {
+            "operands": "ROOMFAIL",
+            "reasonff": "INVLNAME",
+            "roomname": mesgdict["roomname"],
+            "ownrname": mesgdict["username"]
+        }
+        await sockobjc.send(json.dumps(makefail))
+
+
 async def chatroom(sockobjc, path):
     try:
         if sockobjc not in USERLIST.keys():
@@ -143,6 +198,12 @@ async def chatroom(sockobjc, path):
                 if mesgdict["operands"] == "IDENTIFY":
                     print(mesgdict)
                     await new_username_presence_check_and_identification(sockobjc, mesgdict)
+        elif sockobjc in USERLIST.keys():
+            async for mesgjson in sockobjc:
+                mesgdict = json.loads(mesgjson)
+                if mesgdict["operands"] == "MAKEROOM":
+                    print(mesgdict)
+                    await create_new_chatroom(sockobjc, mesgdict)
     finally:
         await old_username_userlist_and_roomlist_removal(sockobjc)
 
