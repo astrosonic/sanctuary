@@ -49,13 +49,17 @@ def servenow(netpdata="127.0.0.1", chatport="9696"):
         sys.exit()
 
 
-def mainfunc(chatport, netprotc):
+def mainfunc(chatport, netprotc, ip_address):
     print(" > [" + str(time.ctime()) + "] [HOLAUSER] Starting Sanctuary...")
     netpdata = ""
     if netprotc == "ipprotv6":
         print(" > [" + str(time.ctime()) + "] [HOLAUSER] IP version : 6")
         netpdata = "::"
+        if ip_address is not None:
+            netpdata = ip_address
     elif netprotc == "ipprotv4":
         print(" > [" + str(time.ctime()) + "] [HOLAUSER] IP version : 4")
         netpdata = "0.0.0.0"
+        if ip_address is not None:
+            netpdata = ip_address
     servenow(netpdata, chatport)

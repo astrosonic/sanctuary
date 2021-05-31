@@ -13,7 +13,7 @@ def chrumnow(netpdata, servport):
     servchat.run(host=netpdata, port=servport)
 
 
-def mainfunc(servport, chatport, netprotc):
+def mainfunc(servport, chatport, netprotc, ip_address):
     global chatp0rt
     chatp0rt = chatport
     print(" * Starting Sanctuary...")
@@ -26,7 +26,11 @@ def mainfunc(servport, chatport, netprotc):
         if netprotc == "ipprotv6":
             print(" * IP version  : 6")
             netpdata = "::"
+            if ip_address is not None:
+                netpdata = ip_address
         elif netprotc == "ipprotv4":
             print(" * IP version  : 4")
             netpdata = "0.0.0.0"
+            if ip_address is not None:
+                netpdata = ip_address
         chrumnow(netpdata, servport)
