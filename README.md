@@ -113,6 +113,10 @@ Options:
 ```shell script
 (venv) $ python3 chatroom.py -c 9696 -4
 ```
+```shell script (to run the executable binary)
+(venv) $ cd websocket_server_executable/dist
+(venv) $ ./chatroom -c 9696 -4
+```
 ![](pictures/sockpics.png)
 - Keep in mind that the IP version must be the same for both the chatroom and websockets servers. For instance - If you want your chatroom to function on IPv6 - provide `-6` suffix to both of the servers.
 - Also note that the arguments for the chatroom server (that is after `-s` suffix and `-c` suffix) must be different as the port numbers that you provide for chatroom and websocket servers would otherwise conflict.
